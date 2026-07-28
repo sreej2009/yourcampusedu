@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { ArrowRight, Award, Users, GraduationCap, Globe2, Clock } from "lucide-react";
-import aboutHeroImg from "../../assets/images/ai-tool.png";
+import aboutHeroImg from "../../assets/images/about_hero.png";
 
 const journey = [
   { year: "2015", milestone: "Founded in Coimbatore" },
@@ -54,6 +54,7 @@ export default function AboutHero() {
         className="abt-hero__bg"
       />
       <div className="abt-hero__overlay" />
+      <div className="abt-hero__scrim" />
 
       <div className="abt-hero__inner">
         <motion.nav
@@ -181,19 +182,38 @@ export default function AboutHero() {
           width: 100%;
           height: 100%;
           object-fit: cover;
-          filter: brightness(0.88) saturate(0.95);
+          /* image stays clearly visible — the medium wash below carries contrast */
+          filter: brightness(0.92) saturate(0.95);
         }
 
+        /* medium, fully opaque purple wash from your theme — no transparency,
+           no near-black darkening, just a solid mid-tone tint over the photo */
         .abt-hero__overlay {
+  position: absolute;
+  inset: 0;
+
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--primary) 75%, transparent) 0%,
+    color-mix(in srgb, var(--primary) 65%, transparent) 45%,
+    color-mix(in srgb, var(--primary-dark) 45%, transparent) 100%
+  );
+
+  mix-blend-mode: normal;
+}
+
+        /* centered scrim so the text block sits on a slightly deeper, calm
+           patch of the same medium tone, regardless of what's behind it */
+        .abt-hero__scrim {
           position: absolute;
           inset: 0;
-          background: linear-gradient(
-            180deg,
-            color-mix(in srgb, var(--primary-dark) 32%, transparent) 0%,
-            color-mix(in srgb, var(--primary-dark) 12%, transparent) 40%,
-            color-mix(in srgb, var(--primary-dark) 20%, transparent) 70%,
-            color-mix(in srgb, var(--primary-dark) 48%, transparent) 100%
+          background: radial-gradient(
+            62% 56% at 50% 46%,
+            color-mix(in srgb, var(--primary-dark) 42%, var(--primary) 58%) 0%,
+            transparent 100%
           );
+          mix-blend-mode: multiply;
+          opacity: 0.75;
         }
 
         .abt-hero__inner {
@@ -213,20 +233,18 @@ export default function AboutHero() {
           gap: 0.5rem;
         }
         .abt-hero__crumb-link {
-          color: color-mix(in srgb, var(--text-white) 85%, transparent);
+          color: var(--text-white);
           font-size: 0.8rem;
           font-weight: 500;
           text-decoration: none;
-          text-shadow: 0 1px 8px color-mix(in srgb, var(--primary-dark) 55%, transparent);
         }
         .abt-hero__crumb-sep {
-          color: color-mix(in srgb, var(--text-white) 55%, transparent);
+          color: color-mix(in srgb, var(--text-white) 60%, var(--primary-dark));
           font-size: 0.8rem;
         }
         .abt-hero__crumb-current {
-          color: color-mix(in srgb, var(--text-white) 70%, transparent);
+          color: color-mix(in srgb, var(--text-white) 82%, var(--primary-dark));
           font-size: 0.8rem;
-          text-shadow: 0 1px 8px color-mix(in srgb, var(--primary-dark) 55%, transparent);
         }
 
         .abt-hero__badge {
@@ -236,9 +254,7 @@ export default function AboutHero() {
           margin-bottom: 1.75rem;
           padding: 0.5rem 1rem;
           border-radius: var(--radius-sm);
-          background: color-mix(in srgb, var(--text-white) 55%, transparent);
-          backdrop-filter: blur(14px);
-          -webkit-backdrop-filter: blur(14px);
+          background: var(--primary-light);
           border-left: 3px solid var(--secondary);
           color: var(--primary-dark);
           font-size: 0.8rem;
@@ -257,15 +273,12 @@ export default function AboutHero() {
           letter-spacing: -0.02em;
           margin: 0;
           color: var(--text-white);
-          text-shadow: 0 4px 24px color-mix(in srgb, var(--primary-dark) 65%, transparent);
         }
         .abt-hero__title-accent {
           background-image: var(--gradient-primary);
           -webkit-background-clip: text;
           background-clip: text;
           color: transparent;
-          text-shadow: none;
-          filter: drop-shadow(0 4px 20px color-mix(in srgb, var(--primary-dark) 45%, transparent));
         }
 
         .abt-hero__rule {
@@ -278,10 +291,9 @@ export default function AboutHero() {
         .abt-hero__subtext {
           margin: 1.5rem auto 0;
           max-width: 34rem;
-          color: color-mix(in srgb, var(--text-white) 92%, transparent);
+          color: color-mix(in srgb, var(--text-white) 92%, var(--primary-dark));
           font-size: 1rem;
           line-height: 1.8;
-          text-shadow: 0 2px 16px color-mix(in srgb, var(--primary-dark) 55%, transparent);
         }
 
         .abt-hero__cta-row {
@@ -319,12 +331,12 @@ export default function AboutHero() {
           transform: translateX(3px);
         }
         .abt-hero__btn--ghost {
-          background: color-mix(in srgb, var(--text-white) 55%, transparent);
-          border: 1px solid color-mix(in srgb, var(--text-white) 45%, transparent);
+          background: var(--bg-main);
+          border: 1px solid var(--border);
           color: var(--primary-dark);
         }
         .abt-hero__btn--ghost:hover {
-          background: color-mix(in srgb, var(--text-white) 75%, transparent);
+          background: var(--primary-light);
         }
 
         .abt-hero__ticker {
@@ -334,8 +346,8 @@ export default function AboutHero() {
           gap: 0.65rem;
           padding: 0.6rem 1.25rem;
           border-radius: var(--radius-sm);
-          background: color-mix(in srgb, var(--primary-dark) 85%, black);
-          border: 1px solid color-mix(in srgb, var(--accent-green) 22%, transparent);
+          background: var(--gradient-secondary);
+          border: 1px solid color-mix(in srgb, var(--accent-green) 30%, transparent);
           max-width: 100%;
           box-shadow: var(--shadow-md);
         }
@@ -384,10 +396,8 @@ export default function AboutHero() {
           max-width: 40rem;
           padding: 1.25rem 1rem;
           border-radius: var(--radius-md);
-          background: color-mix(in srgb, var(--text-white) 65%, transparent);
-          backdrop-filter: blur(14px);
-          -webkit-backdrop-filter: blur(14px);
-          border: 1px solid color-mix(in srgb, var(--text-white) 45%, transparent);
+          background: var(--bg-main);
+          border: 1px solid var(--border);
           box-shadow: var(--shadow-md);
         }
         @media (min-width: 640px) {
@@ -407,7 +417,7 @@ export default function AboutHero() {
         }
         .abt-hero__stat:hover {
           border-top-color: var(--accent-green);
-          background: color-mix(in srgb, var(--primary) 6%, transparent);
+          background: var(--primary-light);
         }
         .abt-hero__stat-icon {
           color: var(--secondary);

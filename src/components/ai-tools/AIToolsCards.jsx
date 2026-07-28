@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Brain,
   CheckCircle2,
@@ -23,6 +24,7 @@ const tools = [
       "Get personalized course and destination recommendations based on your academic profile, scores, and aspirations.",
     accent: "var(--extra-purple)",
     features: ["Personalized Results", "Instant Insights", "Student Friendly"],
+    to: "/ai-course-match",
   },
   {
     icon: CheckCircle2,
@@ -33,6 +35,7 @@ const tools = [
       "Know exactly which universities and programs you qualify for — no guesswork, no wasted applications.",
     accent: "var(--accent-green)",
     features: ["Instant Evaluation", "Accurate Criteria", "Global Database"],
+    to: "/eligibility-checker",
   },
   {
     icon: Wallet,
@@ -43,6 +46,7 @@ const tools = [
       "Estimate full study costs — tuition, living, travel, and hidden expenses — broken down by country and city.",
     accent: "var(--extra-orange)",
     features: ["Expense Breakdown", "Multi-Currency", "Hidden Cost Alerts"],
+    to: "/budget-calculator",
   },
   {
     icon: BarChart3,
@@ -53,6 +57,7 @@ const tools = [
       "Side-by-side university comparisons across fees, rankings, placement rates, and return on investment.",
     accent: "var(--accent-blue)",
     features: ["Side-by-Side View", "ROI Analysis", "Detailed Metrics"],
+    to: "/compare-colleges",
   },
   {
     icon: Globe2,
@@ -63,10 +68,13 @@ const tools = [
       "Answer a few questions and discover which country's education system, culture, and costs suit you best.",
     accent: "var(--accent-pink)",
     features: ["Lifestyle Match", "Budget Alignment", "Top 3 Countries"],
+    to: "/country-fit-quiz",
   },
 ];
 
 function AIToolsCards() {
+  const navigate = useNavigate();
+
   return (
     <section
       className="py-28 relative overflow-hidden"
@@ -120,6 +128,7 @@ function AIToolsCards() {
           transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
                       box-shadow 0.6s cubic-bezier(0.16, 1, 0.3, 1),
                       border-color 0.4s ease;
+          cursor: pointer;
         }
 
         @media (min-width: 768px) {
@@ -476,6 +485,16 @@ function AIToolsCards() {
                 key={index}
                 className={`aitool-row ${isAlternate ? "aitool-row--alternate" : ""}`}
                 style={{ "--card-accent": tool.accent }}
+                role="link"
+                tabIndex={0}
+                onClick={() => navigate(tool.to)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    navigate(tool.to);
+                  }
+                }}
+                aria-label={`Open ${tool.title}`}
               >
                 <div className="aitool-row__accent-line" />
                 <div className="aitool-row__wash" />
@@ -517,7 +536,14 @@ function AIToolsCards() {
 
                 {/* Interactive End Boundary CTA */}
                 <div className="aitool-row__cta-wrap">
-                  <button className="aitool-row__cta" aria-label={`Explore ${tool.title}`}>
+                  <button
+                    className="aitool-row__cta"
+                    aria-label={`Explore ${tool.title}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(tool.to);
+                    }}
+                  >
                     <span className="aitool-row__cta-icon">
                       <ArrowRight size={18} strokeWidth={2.5} />
                     </span>

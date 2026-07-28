@@ -1,53 +1,68 @@
-import React, { useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { Compass } from "lucide-react";
-
-import { destinations } from "../data/studyDestination";
-import { countryDetails } from "../data/countryDetails";
-import { universitiesData } from "../data/universitiesData";
+import { CompassIcon } from "lucide-react";
 
 import CountryHero from "../components/study-destination/country-details/CountryHero";
 import WhyChooseCountry from "../components/study-destination/country-details/WhyChooseCountry";
 import UniversitySection from "../components/study-destination/country-details/UniversitySection";
 import CountryCTA from "../components/study-destination/country-details/CountryCTA";
 
+import countryDetails from "../Data/countryDetails";
+import universitiesData from "../Data/universitiesData";
+
 export default function CountryDetails() {
   const { countryId } = useParams();
-
-  const destination = destinations.find((d) => d.id === countryId);
-  const details = countryDetails[countryId];
+  const country = countryDetails[countryId];
   const universities = universitiesData[countryId];
 
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
-    if (destination) {
-      document.title = `Study in ${destination.name} | YourCampus`;
-    }
-  }, [countryId, destination]);
-
-  if (!destination || !details) {
+  if (!country) {
     return (
-      <div className="cd-notfound">
-        <Compass size={40} />
-        <h1>We haven't mapped this destination yet</h1>
-        <p>Check back soon, or explore the destinations we've already covered.</p>
-        <Link to="/study-destination" className="cd-notfound__link">
-          Back to all destinations
+      <div className="country-not-found">
+        <CompassIcon size={40} strokeWidth={1.6} />
+        <h1>We couldn't find that destination</h1>
+        <p>The country you're looking for isn't on our board yet. Try another gate.</p>
+        <Link to="/study-destination" className="country-not-found__link">
+          Back to Study Destinations
         </Link>
 
         <style>{`
-          .cd-notfound {
-            min-height: 60vh; display: flex; flex-direction: column; align-items: center;
-            justify-content: center; text-align: center; gap: 14px; padding: 60px 24px;
-            font-family: var(--font-main); color: var(--text-dark);
+          .country-not-found {
+            min-height: 60vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            gap: 0.75rem;
+            padding: 3rem 1.5rem;
+            font-family: var(--font-main);
+            color: var(--text-medium);
           }
-          .cd-notfound svg { color: var(--primary); margin-bottom: 6px; }
-          .cd-notfound h1 { font-size: 1.5rem; font-weight: 800; margin: 0; }
-          .cd-notfound p { color: var(--text-medium); margin: 0; max-width: 420px; }
-          .cd-notfound__link {
-            margin-top: 12px; font-weight: 600; color: var(--text-white);
-            background: var(--gradient-secondary); padding: 12px 24px;
-            border-radius: var(--radius-lg); text-decoration: none;
+          .country-not-found svg {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+          }
+          .country-not-found h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 0;
+          }
+          .country-not-found p {
+            margin: 0 0 0.75rem;
+            max-width: 420px;
+          }
+          .country-not-found__link {
+            font-weight: 600;
+            color: var(--text-white);
+            background: var(--gradient-primary);
+            padding: 0.8rem 1.5rem;
+            border-radius: var(--radius-md);
+            text-decoration: none;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+          }
+          .country-not-found__link:hover {
+            transform: translateY(-2px);
           }
         `}</style>
       </div>
@@ -55,15 +70,15 @@ export default function CountryDetails() {
   }
 
   return (
-    <main className="cd-page">
-      <CountryHero destination={destination} details={details} />
-      <WhyChooseCountry destination={destination} details={details} />
-      <UniversitySection destination={destination} universities={universities} />
-      <CountryCTA destination={destination} details={details} />
-
-      <style>{`
-        .cd-page { background: var(--bg-main); }
-      `}</style>
+    <main className="country-details-page">
+      <CountryHero country={country} />
+      <WhyChooseCountry countryName={country.name} />
+      <UniversitySection
+        universities={universities}
+        countryName={country.name}
+        countryId={countryId}
+      />
+      <CountryCTA countryName={country.name} />
     </main>
   );
 }

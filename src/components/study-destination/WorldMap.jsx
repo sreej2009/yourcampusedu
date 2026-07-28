@@ -1,6 +1,7 @@
 // src/components/study-destination/WorldMap.jsx
 // Requires: npm install d3-geo topojson-client
 import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { Link } from "react-router-dom";
 import { geoEqualEarth, geoPath } from "d3-geo";
 import { feature } from "topojson-client";
 import { motion, AnimatePresence } from "framer-motion";
@@ -372,10 +373,16 @@ const WorldMap = () => {
                   </div>
                 </div>
 
-                <a href={`/destinations/${selected.id}`} className="sd-map__pass-cta">
+                {/*
+                  FIX: was a plain <a href="/destinations/:id">, which 404'd —
+                  App.jsx defines the Country Details route as
+                  /study-destination/:countryId. Switched to React Router's
+                  Link so this is a client-side nav, not a full page reload.
+                */}
+                <Link to={`/study-destination/${selected.id}`} className="sd-map__pass-cta">
                   <span>Explore {selected.name}</span>
                   <ArrowRight size={16} />
-                </a>
+                </Link>
               </motion.div>
             )}
           </AnimatePresence>

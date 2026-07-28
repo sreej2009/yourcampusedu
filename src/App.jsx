@@ -49,7 +49,6 @@ function App() {
         <Route path="/compare-colleges" element={<CompareColleges />} />
         <Route path="/country-fit-quiz" element={<CountryFitQuiz />} />
         <Route path="/study-destination" element={<StudyDestination/>} />
-        <Route path="/study-destination" element={<StudyDestination />} />
         <Route path="/study-destination/:countryId" element={<CountryDetails />}/>
         <Route path="/contact" element={<Contact/>} />   
         <Route path="/study-india" element={<StudyIndia />} />

@@ -1,187 +1,93 @@
-import { useState } from "react";
-import { motion, useMotionValue, useTransform } from "framer-motion";
-import { ArrowRight, Sparkles, MapPin } from "lucide-react";
+import { motion } from "framer-motion";
+import {
+  ArrowRight,
+  Sparkles,
+  GraduationCap,
+  TrendingUp,
+  Star,
+  CheckCircle2,
+} from "lucide-react";
+
 import { Link } from "react-router-dom";
-import heroImg from "../../assets/images/hero.avif";
+import heroImg from "../../assets/images/hero.png";
+
+/* ─────────────────────────────────────────────
+   ANIMATIONS
+───────────────────────────────────────────── */
+
+const fadeUp = (delay = 0) => ({
+  initial: { opacity: 0, y: 26 },
+  animate: { opacity: 1, y: 0 },
+  transition: {
+    duration: 0.72,
+    delay,
+    ease: [0.16, 1, 0.3, 1],
+  },
+});
+
+const fadeIn = (delay = 0) => ({
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  transition: {
+    duration: 0.6,
+    delay,
+  },
+});
 
 /* ─────────────────────────────────────────────
    DATA
 ───────────────────────────────────────────── */
 
-const PROFILE_CHIPS = ["B.Tech · CS", "IELTS 7.5", "Budget ₹25L"];
-
-const MATCHES = [
-  { university: "University of Toronto", flag: "🇨🇦", program: "MS Computer Science", score: 96 },
-  { university: "University of Melbourne", flag: "🇦🇺", program: "MS Data Science", score: 91 },
-  { university: "TU Munich", flag: "🇩🇪", program: "MS Computer Science", score: 88 },
+const BULLETS = [
+  "AI-powered university matching in minutes",
+  "Scholarships, visa & SOP guidance included",
+  "Expert counsellors from top global institutions",
 ];
 
-const HEADLINE = "The AI That Actually Knows Where You'll Get In.";
+const TRUST_AVATARS = [
+  "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=100",
+  "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=100",
+  "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=100",
+  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=100",
+];
 
-/* ─────────────────────────────────────────────
-   KINETIC WORD-REVEAL HEADLINE
-───────────────────────────────────────────── */
+const DESTINATIONS = [
+  {
+    flag: "🇨🇦",
+    name: "Canada",
+    color: "rgba(255, 0, 0, 0.08)",
+  },
 
-function KineticTitle({ text }) {
-  const words = text.split(" ");
-  return (
-    <h1 className="hs__title">
-      {words.map((word, i) => (
-        <span className="hs__word-mask" key={i}>
-          <motion.span
-            className="hs__word"
-            initial={{ y: "115%" }}
-            animate={{ y: "0%" }}
-            transition={{ duration: 0.75, delay: 0.15 + i * 0.045, ease: [0.16, 1, 0.3, 1] }}
-          >
-            {word}
-          </motion.span>
-        </span>
-      ))}
-    </h1>
-  );
-}
+  {
+    flag: "🇬🇧",
+    name: "United Kingdom",
+    color: "rgba(0, 60, 255, 0.08)",
+  },
 
-/* ─────────────────────────────────────────────
-   SPLIT-FLAP DIGIT REEL — used for confidence scores
-───────────────────────────────────────────── */
+  {
+    flag: "🇦🇺",
+    name: "Australia",
+    color: "rgba(255, 170, 0, 0.08)",
+  },
 
-function DigitReel({ char, delay }) {
-  if (!/[0-9]/.test(char)) {
-    return <span className="reel reel--static">{char}</span>;
-  }
-  const target = parseInt(char, 10);
-  return (
-    <span className="reel">
-      <motion.span
-        className="reel__col"
-        initial={{ y: "0%" }}
-        animate={{ y: `-${target * 10}%` }}
-        transition={{ duration: 0.9, delay, ease: [0.22, 1, 0.36, 1] }}
-      >
-        {Array.from({ length: 10 }, (_, n) => (
-          <span className="reel__digit" key={n}>{n}</span>
-        ))}
-      </motion.span>
-    </span>
-  );
-}
+  {
+    flag: "🇺🇸",
+    name: "United States",
+    color: "rgba(0, 80, 255, 0.08)",
+  },
 
-function ScoreValue({ value, delay }) {
-  return (
-    <span className="match__score-value">
-      {String(value).split("").map((ch, i) => (
-        <DigitReel key={i} char={ch} delay={delay + i * 0.05} />
-      ))}
-      %
-    </span>
-  );
-}
+  {
+    flag: "🇩🇪",
+    name: "Germany",
+    color: "rgba(255, 180, 0, 0.08)",
+  },
 
-/* ─────────────────────────────────────────────
-   TILTING MATCH ENGINE PANEL
-───────────────────────────────────────────── */
-
-function MatchPanel() {
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const rotateX = useTransform(y, [-60, 60], [6, -6]);
-  const rotateY = useTransform(x, [-60, 60], [-6, 6]);
-
-  function handleMove(e) {
-    const rect = e.currentTarget.getBoundingClientRect();
-    x.set(e.clientX - rect.left - rect.width / 2);
-    y.set(e.clientY - rect.top - rect.height / 2);
-  }
-  function handleLeave() {
-    x.set(0);
-    y.set(0);
-  }
-
-  return (
-    <motion.div
-      className="panel"
-      style={{ rotateX, rotateY, transformPerspective: 1200 }}
-      onMouseMove={handleMove}
-      onMouseLeave={handleLeave}
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-    >
-      <div className="panel__head">
-        <div className="panel__dots">
-          <span style={{ background: "var(--danger)" }} />
-          <span style={{ background: "var(--warning)" }} />
-          <span style={{ background: "var(--accent-green)" }} />
-        </div>
-        <span className="panel__title">AI Match Engine</span>
-        <span className="panel__live">
-          <span className="panel__live-dot" />
-          Live
-        </span>
-      </div>
-
-      <div className="panel__body">
-        <div className="panel__row-label">Your Profile</div>
-        <div className="panel__chips">
-          {PROFILE_CHIPS.map((chip, i) => (
-            <motion.span
-              className="panel__chip"
-              key={chip}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.55 + i * 0.1 }}
-            >
-              {chip}
-            </motion.span>
-          ))}
-        </div>
-
-        <div className="panel__scan">
-          <motion.div
-            className="panel__scan-line"
-            initial={{ y: "-100%", opacity: 0 }}
-            animate={{ y: "260%", opacity: [0, 1, 1, 0] }}
-            transition={{ duration: 1.1, delay: 0.95, ease: "easeInOut" }}
-          />
-        </div>
-
-        <div className="panel__row-label">Ranked Matches</div>
-        <div className="panel__matches">
-          {MATCHES.map((m, i) => (
-            <motion.div
-              className="match"
-              key={m.university}
-              initial={{ opacity: 0, x: 14 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 1.5 + i * 0.15, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <div className="match__info">
-                <span className="match__flag">{m.flag}</span>
-                <div>
-                  <div className="match__uni">{m.university}</div>
-                  <div className="match__program">{m.program}</div>
-                </div>
-              </div>
-
-              <div className="match__score">
-                <ScoreValue value={m.score} delay={1.7 + i * 0.15} />
-                <div className="match__bar">
-                  <motion.div
-                    className="match__bar-fill"
-                    initial={{ width: 0 }}
-                    animate={{ width: `${m.score}%` }}
-                    transition={{ duration: 0.8, delay: 1.65 + i * 0.15, ease: [0.16, 1, 0.3, 1] }}
-                  />
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </motion.div>
-  );
-}
+  {
+    flag: "🇮🇪",
+    name: "Ireland",
+    color: "rgba(49,185,120,0.10)",
+  },
+];
 
 /* ─────────────────────────────────────────────
    COMPONENT
@@ -195,138 +101,254 @@ export default function HeroSection() {
         .hs {
           position: relative;
           overflow: hidden;
-          background: var(--bg-dark);
+          padding: 86px 0 70px;
+
+          background:
+            radial-gradient(circle at top left, rgba(109,83,163,0.10), transparent 30%),
+            radial-gradient(circle at bottom right, rgba(49,185,120,0.08), transparent 28%),
+            linear-gradient(
+              180deg,
+              #faf8ff 0%,
+              #f8f7ff 30%,
+              #ffffff 100%
+            );
+
           font-family: var(--font-main);
-          color: var(--text-white);
-          padding: 128px 0 0;
         }
 
-        /* ── background texture ── */
+        /* glow */
 
-        .hs__bg {
+        .hs__glow {
           position: absolute;
           inset: 0;
+          pointer-events: none;
           z-index: 0;
         }
 
-        .hs__bg img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          opacity: 0.22;
-          mix-blend-mode: luminosity;
-          filter: saturate(0.6);
-        }
-
-        .hs__bg-tint {
+        .hs__glow::before,
+        .hs__glow::after {
+          content: "";
           position: absolute;
-          inset: 0;
-          background:
-            linear-gradient(180deg,
-              color-mix(in srgb, var(--bg-dark) 88%, transparent) 0%,
-              color-mix(in srgb, var(--bg-dark) 60%, transparent) 45%,
-              var(--bg-dark) 100%
-            ),
-            linear-gradient(100deg,
-              color-mix(in srgb, var(--primary-dark) 70%, transparent) 0%,
-              transparent 55%
-            );
+          border-radius: 50%;
+          filter: blur(90px);
         }
 
-        .hs__grain {
-          position: absolute;
-          inset: 0;
-          z-index: 1;
-          opacity: 0.05;
-          mix-blend-mode: overlay;
-          pointer-events: none;
-          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        .hs__glow::before {
+          width: 340px;
+          height: 340px;
+          top: -120px;
+          left: -80px;
+          background: rgba(109,83,163,0.13);
         }
 
-        /* ── layout ── */
+        .hs__glow::after {
+          width: 320px;
+          height: 320px;
+          bottom: -100px;
+          right: -60px;
+          background: rgba(49,185,120,0.11);
+        }
+
+        /* WRAP */
 
         .hs__wrap {
           position: relative;
           z-index: 2;
+
+          width: 100%;
           max-width: 1280px;
+
           margin: 0 auto;
-          padding: 0 48px;
+          padding: 0 42px;
+
           display: grid;
-          grid-template-columns: 1.05fr 0.95fr;
-          gap: 40px;
-          align-items: center;
+          grid-template-columns: 1.02fr 0.98fr;
+          align-items: start;
+
+          gap: 48px;
+          box-sizing: border-box;
         }
+
+        /* LEFT */
 
         .hs__left {
-          max-width: 560px;
-          padding-bottom: 70px;
+          max-width: 610px;
+          padding-top: 12px;
         }
 
-        /* ── eyebrow ── */
+        /* TAG */
 
-        .hs__eyebrow {
+        .hs__tag {
           display: inline-flex;
           align-items: center;
-          gap: 8px;
-          padding: 7px 14px 7px 10px;
+          gap: 10px;
+
+          padding: 7px 16px 7px 8px;
+
           border-radius: 999px;
-          border: 1px solid color-mix(in srgb, var(--text-white) 14%, transparent);
-          background: color-mix(in srgb, var(--text-white) 5%, transparent);
-          margin-bottom: 28px;
+
+          background: rgba(109,83,163,0.08);
+
+          border: 1px solid rgba(109,83,163,0.13);
+
+          margin-bottom: 24px;
+
+          backdrop-filter: blur(10px);
         }
 
-        .hs__eyebrow svg { color: var(--accent-green); }
+        .hs__tag-icon {
+          width: 26px;
+          height: 26px;
 
-        .hs__eyebrow span {
-          font-size: 11px;
+          border-radius: 50%;
+
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          background: var(--gradient-primary);
+
+          color: white;
+
+          flex-shrink: 0;
+        }
+
+        .hs__tag-text {
+          font-size: 10.5px;
           font-weight: 700;
-          letter-spacing: 1.4px;
+          letter-spacing: 1.8px;
           text-transform: uppercase;
-          color: color-mix(in srgb, var(--text-white) 85%, transparent);
+
+          color: var(--primary);
+
+          font-family: var(--font-main);
         }
 
-        /* ── kinetic headline ── */
+        .hs__pulse {
+          width: 6px;
+          height: 6px;
+
+          border-radius: 50%;
+
+          background: var(--accent-green);
+
+          position: relative;
+
+          flex-shrink: 0;
+        }
+
+        .hs__pulse::after {
+          content: "";
+
+          position: absolute;
+          inset: -4px;
+
+          border-radius: inherit;
+
+          background: rgba(49,185,120,0.25);
+
+          animation: pulse 1.8s infinite;
+        }
+
+        @keyframes pulse {
+          0% {
+            transform: scale(0.8);
+            opacity: 1;
+          }
+
+          100% {
+            transform: scale(2.3);
+            opacity: 0;
+          }
+        }
+
+        /* HEADING */
 
         .hs__title {
           margin: 0;
-          font-size: clamp(36px, 4.4vw, 58px);
-          line-height: 1.08;
-          letter-spacing: -1.8px;
+
+          font-size: clamp(38px, 4.8vw, 64px);
+          line-height: 1.04;
+          letter-spacing: -2.4px;
           font-weight: 800;
+
+          color: var(--text-dark);
+
+          font-family: var(--font-main);
         }
 
-        .hs__word-mask {
-          display: inline-block;
-          overflow: hidden;
-          vertical-align: top;
-          margin-right: 0.26em;
-        }
-
-        .hs__word:last-of-type { }
-
-        .hs__title .hs__word-mask:nth-of-type(2) .hs__word,
-        .hs__title .hs__word-mask:nth-of-type(3) .hs__word {
+        .hs__accent {
           background: var(--gradient-primary);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
         }
 
+        /* DESC */
+
         .hs__desc {
           margin-top: 24px;
-          font-size: 16px;
-          line-height: 1.85;
-          color: color-mix(in srgb, var(--text-white) 68%, transparent);
-          max-width: 470px;
+
+          font-size: 15.5px;
+          line-height: 1.9;
+
+          color: var(--text-light);
+
+          max-width: 540px;
         }
 
-        /* ── actions ── */
+        .hs__desc strong {
+          color: var(--text-dark);
+          font-weight: 700;
+        }
+
+        /* BULLETS */
+
+        .hs__bullets {
+          display: flex;
+          flex-direction: column;
+          gap: 11px;
+
+          margin-top: 24px;
+        }
+
+        .hs__bullet {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+
+          font-size: 13.5px;
+          font-weight: 500;
+
+          color: var(--text-medium);
+        }
+
+        .hs__check {
+          width: 20px;
+          height: 20px;
+
+          border-radius: 50%;
+
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          background: rgba(49,185,120,0.10);
+
+          color: var(--accent-green);
+
+          flex-shrink: 0;
+        }
+
+        /* BUTTONS */
 
         .hs__actions {
           display: flex;
           align-items: center;
-          gap: 28px;
-          margin-top: 36px;
+          gap: 14px;
+
+          margin-top: 34px;
+
           flex-wrap: wrap;
         }
 
@@ -334,383 +356,653 @@ export default function HeroSection() {
           display: inline-flex;
           align-items: center;
           gap: 10px;
-          padding: 15px 26px;
-          border-radius: var(--radius-sm);
+
+          padding: 15px 28px;
+
+          border-radius: 18px;
+
           text-decoration: none;
+
           font-size: 14px;
           font-weight: 700;
-          color: var(--text-white);
+
+          color: white;
+
           background: var(--gradient-primary);
-          box-shadow: var(--shadow-md);
-          transition: var(--transition);
+
+          box-shadow:
+            0 14px 34px rgba(109,83,163,0.22),
+            0 8px 18px rgba(109,83,163,0.16);
+
+          position: relative;
+          overflow: hidden;
+
+          transition:
+            transform 0.3s ease,
+            box-shadow 0.3s ease;
         }
 
         .hs__btn-primary:hover {
-          transform: translateY(-3px);
-          box-shadow: var(--shadow-lg);
+          transform: translateY(-4px);
+
+          box-shadow:
+            0 20px 44px rgba(109,83,163,0.28),
+            0 12px 24px rgba(49,185,120,0.18);
         }
 
-        .hs__link {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          text-decoration: none;
-          font-size: 14px;
-          font-weight: 600;
-          color: var(--text-white);
-          border-bottom: 1px solid color-mix(in srgb, var(--text-white) 30%, transparent);
-          padding-bottom: 3px;
-          transition: var(--transition);
-        }
+        .hs__arrow {
+          width: 30px;
+          height: 30px;
 
-        .hs__link:hover {
-          color: var(--accent-green);
-          border-color: var(--accent-green);
-          gap: 12px;
-        }
+          border-radius: 10px;
 
-        /* ── marquee ── */
-
-        .hs__marquee-wrap {
-          position: relative;
-          z-index: 2;
-          border-top: 1px solid color-mix(in srgb, var(--text-white) 10%, transparent);
-          padding: 22px 0;
-          overflow: hidden;
-          -webkit-mask-image: linear-gradient(90deg, transparent, black 10%, black 90%, transparent);
-          mask-image: linear-gradient(90deg, transparent, black 10%, black 90%, transparent);
-        }
-
-        .hs__marquee {
-          display: flex;
-          width: max-content;
-          animation: hsMarquee 26s linear infinite;
-        }
-
-        .hs__marquee span {
-          display: inline-flex;
-          align-items: center;
-          gap: 10px;
-          font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-          font-size: 12.5px;
-          font-weight: 600;
-          letter-spacing: 0.4px;
-          color: color-mix(in srgb, var(--text-white) 45%, transparent);
-          white-space: nowrap;
-          padding: 0 22px;
-          border-right: 1px solid color-mix(in srgb, var(--text-white) 12%, transparent);
-        }
-
-        @keyframes hsMarquee {
-          to { transform: translateX(-50%); }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .hs__marquee { animation: none; }
-        }
-
-        /* ── match engine panel ── */
-
-        .panel {
-          position: relative;
-          border-radius: var(--radius-xl);
-          border: 1px solid color-mix(in srgb, var(--text-white) 12%, transparent);
-          background: color-mix(in srgb, var(--bg-dark) 40%, transparent);
-          backdrop-filter: blur(22px);
-          box-shadow: var(--shadow-lg);
-          overflow: hidden;
-        }
-
-        .panel__head {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          padding: 16px 20px;
-          border-bottom: 1px solid color-mix(in srgb, var(--text-white) 10%, transparent);
-        }
-
-        .panel__dots {
-          display: flex;
-          gap: 6px;
-        }
-
-        .panel__dots span {
-          width: 8px;
-          height: 8px;
-          border-radius: 50%;
-          opacity: 0.85;
-        }
-
-        .panel__title {
-          font-size: 12.5px;
-          font-weight: 700;
-          color: color-mix(in srgb, var(--text-white) 82%, transparent);
-        }
-
-        .panel__live {
-          margin-left: auto;
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          font-size: 10.5px;
-          font-weight: 700;
-          letter-spacing: 1px;
-          text-transform: uppercase;
-          color: var(--accent-green);
-        }
-
-        .panel__live-dot {
-          width: 6px;
-          height: 6px;
-          border-radius: 50%;
-          background: var(--accent-green);
-          position: relative;
-        }
-
-        .panel__live-dot::after {
-          content: "";
-          position: absolute;
-          inset: -4px;
-          border-radius: 50%;
-          background: color-mix(in srgb, var(--accent-green) 35%, transparent);
-          animation: hsPulse 1.8s infinite;
-        }
-
-        @keyframes hsPulse {
-          0% { transform: scale(0.8); opacity: 1; }
-          100% { transform: scale(2.4); opacity: 0; }
-        }
-
-        .panel__body {
-          padding: 22px 20px 20px;
-        }
-
-        .panel__row-label {
-          font-size: 10px;
-          font-weight: 700;
-          letter-spacing: 1.4px;
-          text-transform: uppercase;
-          color: color-mix(in srgb, var(--text-white) 42%, transparent);
-          margin-bottom: 10px;
-        }
-
-        .panel__chips {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 8px;
-        }
-
-        .panel__chip {
-          font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-          font-size: 11.5px;
-          font-weight: 600;
-          padding: 7px 12px;
-          border-radius: 999px;
-          background: color-mix(in srgb, var(--primary) 22%, transparent);
-          border: 1px solid color-mix(in srgb, var(--primary) 40%, transparent);
-          color: color-mix(in srgb, var(--text-white) 92%, transparent);
-        }
-
-        .panel__scan {
-          position: relative;
-          height: 1px;
-          margin: 20px 0;
-          background: color-mix(in srgb, var(--text-white) 8%, transparent);
-          overflow: visible;
-        }
-
-        .panel__scan-line {
-          position: absolute;
-          left: 0;
-          right: 0;
-          height: 44px;
-          top: -20px;
-          background: linear-gradient(180deg,
-            transparent,
-            color-mix(in srgb, var(--accent-green) 45%, transparent),
-            transparent
-          );
-        }
-
-        .panel__matches {
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-        }
-
-        .match {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 14px;
-          padding: 12px 14px;
-          border-radius: var(--radius-md);
-          background: color-mix(in srgb, var(--text-white) 4%, transparent);
-          border: 1px solid color-mix(in srgb, var(--text-white) 7%, transparent);
-        }
-
-        .match__info {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          min-width: 0;
-        }
-
-        .match__flag {
-          font-size: 17px;
-          flex-shrink: 0;
-        }
-
-        .match__uni {
-          font-size: 12.5px;
-          font-weight: 700;
-          color: color-mix(in srgb, var(--text-white) 92%, transparent);
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-
-        .match__program {
-          font-size: 11px;
-          color: color-mix(in srgb, var(--text-white) 50%, transparent);
-          margin-top: 2px;
-        }
-
-        .match__score {
-          flex-shrink: 0;
-          width: 74px;
-          text-align: right;
-        }
-
-        .match__score-value {
-          font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-          font-size: 15px;
-          font-weight: 800;
-          color: var(--accent-green);
-          display: inline-flex;
-        }
-
-        .reel {
-          display: inline-block;
-          width: 0.6em;
-          height: 1.05em;
-          overflow: hidden;
-          position: relative;
-          vertical-align: top;
-        }
-
-        .reel--static { width: auto; }
-        .reel__col { display: flex; flex-direction: column; }
-        .reel__digit {
-          height: 1.05em;
           display: flex;
           align-items: center;
           justify-content: center;
+
+          background: rgba(255,255,255,0.14);
+
+          transition: transform 0.28s ease;
         }
 
-        .match__bar {
-          margin-top: 6px;
-          height: 3px;
+        .hs__btn-primary:hover .hs__arrow {
+          transform: translateX(4px);
+        }
+
+        /* SECONDARY BUTTON */
+
+        .hs__btn-secondary {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+
+          padding: 15px 26px;
+
+          border-radius: 18px;
+
+          text-decoration: none;
+
+          font-size: 14px;
+          font-weight: 700;
+
+          color: white;
+
+          background: #151515;
+
+          border: 1px solid rgba(255,255,255,0.06);
+
+          box-shadow:
+            0 12px 30px rgba(0,0,0,0.16);
+
+          transition:
+            transform 0.3s ease,
+            background 0.3s ease,
+            box-shadow 0.3s ease;
+        }
+
+        .hs__btn-secondary:hover {
+          transform: translateY(-4px);
+
+          background: var(--gradient-primary);
+
+          box-shadow:
+            0 18px 40px rgba(109,83,163,0.24),
+            0 10px 22px rgba(49,185,120,0.16);
+        }
+
+        /* TRUST */
+
+        .hs__trust {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+
+          margin-top: 34px;
+
+          flex-wrap: wrap;
+        }
+
+        .hs__avatars {
+          display: flex;
+          align-items: center;
+        }
+
+        .hs__avatar {
+          width: 38px;
+          height: 38px;
+
+          border-radius: 50%;
+
+          overflow: hidden;
+
+          border: 2px solid white;
+
+          margin-left: -10px;
+
+          box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+        }
+
+        .hs__avatar:first-child {
+          margin-left: 0;
+        }
+
+        .hs__avatar img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+        }
+
+        .hs__trust-count {
+          font-size: 13px;
+          font-weight: 800;
+
+          color: var(--text-dark);
+        }
+
+        .hs__trust-sub {
+          font-size: 11px;
+
+          color: var(--text-light);
+
+          margin-top: 2px;
+        }
+
+        .hs__sep {
+          width: 1px;
+          height: 28px;
+
+          background: var(--border);
+        }
+
+        .hs__stars {
+          display: flex;
+          align-items: center;
+          gap: 2px;
+
+          color: #ffb545;
+        }
+
+        .hs__stars-val {
+          margin-left: 6px;
+
+          font-size: 12.5px;
+          font-weight: 800;
+
+          color: var(--text-dark);
+        }
+
+        .hs__stars-meta {
+          font-size: 11px;
+          color: var(--text-light);
+
+          margin-top: 2px;
+        }
+
+        /* RIGHT */
+
+        .hs__right {
+          position: relative;
+          margin-top: -6px;
+        }
+
+        .hs__img-frame {
+          position: relative;
+
+          overflow: hidden;
+
+          border-radius: 34px;
+
+          aspect-ratio: 16 / 11;
+
+          background: white;
+
+          border: 1px solid rgba(109,83,163,0.08);
+
+          box-shadow:
+            0 30px 80px rgba(36,20,79,0.10),
+            0 10px 24px rgba(36,20,79,0.05);
+        }
+
+        .hs__img-frame::before {
+          content: "";
+
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+
+          height: 4px;
+
+          background: var(--gradient-primary);
+
+          z-index: 4;
+        }
+
+        .hs__img-frame::after {
+          content: "";
+
+          position: absolute;
+          inset: 0;
+
+          background:
+            linear-gradient(
+              to top,
+              rgba(18,18,18,0.24),
+              transparent 46%
+            );
+
+          z-index: 1;
+        }
+
+        .hs__img {
+          width: 100%;
+          height: 100%;
+
+          object-fit: cover;
+
+          display: block;
+
+          transition: transform 0.9s cubic-bezier(0.16,1,0.3,1);
+        }
+
+        .hs__img-frame:hover .hs__img {
+          transform: scale(1.04);
+        }
+
+        /* MATCH */
+
+        .hs__match {
+          position: absolute;
+          top: 16px;
+          right: 16px;
+
+          z-index: 5;
+
+          display: inline-flex;
+          align-items: center;
+          gap: 7px;
+
+          padding: 8px 14px;
+
           border-radius: 999px;
-          background: color-mix(in srgb, var(--text-white) 10%, transparent);
+
+          background: rgba(49,185,120,0.94);
+
+          color: white;
+
+          backdrop-filter: blur(12px);
+
+          box-shadow: 0 10px 24px rgba(49,185,120,0.25);
+        }
+
+        .hs__match-text {
+          font-size: 12px;
+          font-weight: 800;
+        }
+
+        /* UNIVERSITY */
+
+        .hs__uni {
+          position: absolute;
+          left: 18px;
+          bottom: 18px;
+
+          z-index: 5;
+
+          display: flex;
+          align-items: center;
+          gap: 12px;
+
+          padding: 12px 14px;
+
+          border-radius: 20px;
+
+          background: rgba(255,255,255,0.92);
+
+          backdrop-filter: blur(16px);
+
+          border: 1px solid rgba(255,255,255,0.6);
+
+          box-shadow: 0 10px 24px rgba(36,20,79,0.12);
+        }
+
+        .hs__uni-icon {
+          width: 40px;
+          height: 40px;
+
+          border-radius: 14px;
+
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          background: var(--gradient-primary);
+
+          color: white;
+
+          flex-shrink: 0;
+        }
+
+        .hs__uni-title {
+          font-size: 13px;
+          font-weight: 800;
+
+          color: var(--text-dark);
+
+          line-height: 1.2;
+        }
+
+        .hs__uni-sub {
+          font-size: 11px;
+
+          color: var(--text-light);
+
+          margin-top: 3px;
+        }
+
+        /* COUNTRIES */
+
+        .hs__countries {
+          position: relative;
+
+          display: flex;
+          flex-wrap: wrap;
+
+          gap: 12px;
+
+          margin-top: 18px;
+
+          padding: 18px;
+
+          border-radius: 26px;
+
+          background:
+            linear-gradient(
+              180deg,
+              rgba(255,255,255,0.78),
+              rgba(255,255,255,0.55)
+            );
+
+          border: 1px solid rgba(109,83,163,0.08);
+
+          backdrop-filter: blur(16px);
+
+          box-shadow:
+            0 16px 40px rgba(36,20,79,0.05);
+
           overflow: hidden;
         }
 
-        .match__bar-fill {
-          height: 100%;
+        .hs__country {
+          position: relative;
+
+          display: inline-flex;
+          align-items: center;
+          gap: 9px;
+
+          padding: 11px 15px;
+
           border-radius: 999px;
-          background: var(--gradient-primary);
+
+          background: white;
+
+          border: 1px solid rgba(109,83,163,0.08);
+
+          font-size: 12.5px;
+          font-weight: 700;
+
+          color: var(--text-dark);
+
+          transition:
+            transform 0.28s ease,
+            border-color 0.28s ease,
+            box-shadow 0.28s ease;
         }
 
-        /* ── responsive ── */
+        .hs__country:hover {
+          transform: translateY(-4px);
 
-        @media (max-width: 980px) {
+          border-color: rgba(109,83,163,0.18);
+
+          box-shadow:
+            0 10px 22px rgba(36,20,79,0.08);
+        }
+
+        .hs__flag-wrap {
+          width: 28px;
+          height: 28px;
+
+          border-radius: 50%;
+
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          flex-shrink: 0;
+
+          font-size: 15px;
+        }
+
+        .hs__country-name {
+          white-space: nowrap;
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 920px) {
+
+          .hs {
+            padding: 70px 0 54px;
+          }
+
           .hs__wrap {
             grid-template-columns: 1fr;
-            padding: 0 24px;
+            gap: 42px;
+            padding: 0 22px;
           }
-          .hs__left { max-width: 100%; padding-bottom: 40px; }
-          .panel { max-width: 460px; margin: 0 auto 56px; }
+
+          .hs__left {
+            max-width: 100%;
+          }
+
+          .hs__right {
+            width: 100%;
+            max-width: 680px;
+            margin: 0 auto;
+          }
         }
 
-        @media (max-width: 480px) {
-          .hs { padding: 108px 0 0; }
-          .hs__actions { flex-direction: column; align-items: flex-start; gap: 18px; }
-          .match__program { display: none; }
+        @media (max-width: 680px) {
+
+          .hs {
+            padding: 56px 0 46px;
+          }
+
+          .hs__wrap {
+            padding: 0 18px;
+            gap: 34px;
+          }
+
+          .hs__title {
+            font-size: 42px;
+            line-height: 1.08;
+            letter-spacing: -1.8px;
+          }
+
+          .hs__desc {
+            font-size: 14px;
+          }
+
+          .hs__actions {
+            flex-direction: column;
+            align-items: stretch;
+          }
+
+          .hs__btn-primary,
+          .hs__btn-secondary {
+            width: 100%;
+            justify-content: center;
+          }
+
+          .hs__sep {
+            display: none;
+          }
+
+          .hs__country {
+            font-size: 11.5px;
+            padding: 8px 12px;
+          }
         }
 
       `}</style>
 
       <section className="hs">
-        <div className="hs__bg">
-          <img src={heroImg} alt="" />
-        </div>
-        <div className="hs__bg-tint" />
-        <div className="hs__grain" />
+        <div className="hs__glow" />
 
         <div className="hs__wrap">
+          {/* LEFT */}
+
           <div className="hs__left">
-            <motion.div
-              className="hs__eyebrow"
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-              <Sparkles size={12} />
-              <span>AI Admissions Engine</span>
+            <motion.div {...fadeUp(0)}>
+              <div className="hs__tag">
+                <span className="hs__tag-icon">
+                  <Sparkles size={12} />
+                </span>
+
+                <span className="hs__tag-text">Global Education Platform</span>
+
+                <span className="hs__pulse" />
+              </div>
             </motion.div>
 
-            <KineticTitle text={HEADLINE} />
+            <motion.h1 className="hs__title" {...fadeUp(0.06)}>
+              Your Gateway to a <br />
+              <span className="hs__accent">Smartest</span> Education <br />
+              Platform
+            </motion.h1>
 
-            <motion.p
-              className="hs__desc"
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.55 }}
-            >
-              Upload your profile once. Get ranked, confidence-scored matches
-              across 500+ universities in six countries — with scholarships
-              and visa steps mapped out automatically.
+            <motion.p className="hs__desc" {...fadeUp(0.13)}>
+              Your Campus helps ambitious students discover the
+              <strong> right universities</strong>, secure
+              <strong> scholarships</strong>, and navigate
+              <strong> admissions & visas</strong> with expert guidance and
+              AI-powered precision.
             </motion.p>
 
-            <motion.div
-              className="hs__actions"
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.65 }}
-            >
+            <motion.div className="hs__bullets" {...fadeUp(0.18)}>
+              {BULLETS.map((item) => (
+                <div className="hs__bullet" key={item}>
+                  <span className="hs__check">
+                    <CheckCircle2 size={12} strokeWidth={2.6} />
+                  </span>
+
+                  {item}
+                </div>
+              ))}
+            </motion.div>
+
+            <motion.div className="hs__actions" {...fadeUp(0.24)}>
               <Link to="/contact" className="hs__btn-primary">
-                <span>Get My Matches</span>
-                <ArrowRight size={15} />
+                <span>Start Matching Free</span>
+
+                <span className="hs__arrow">
+                  <ArrowRight size={15} />
+                </span>
               </Link>
-              <Link to="/about" className="hs__link">
-                <span>Watch it work</span>
-                <ArrowRight size={13} />
+
+              <Link to="/about" className="hs__btn-secondary">
+                See How It Works
               </Link>
+            </motion.div>
+
+            <motion.div className="hs__trust" {...fadeIn(0.42)}>
+              <div className="hs__avatars">
+                {TRUST_AVATARS.map((src, i) => (
+                  <div className="hs__avatar" key={i}>
+                    <img src={src} alt="" />
+                  </div>
+                ))}
+              </div>
+
+              <div>
+                <div className="hs__trust-count">10,000+ Students</div>
+
+                <div className="hs__trust-sub">
+                  Trusted across India & beyond
+                </div>
+              </div>
+
+              <div className="hs__sep" />
+
+              <div>
+                <div className="hs__stars">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} size={12} fill="currentColor" />
+                  ))}
+
+                  <span className="hs__stars-val">4.9</span>
+                </div>
+
+                <div className="hs__stars-meta">2,400+ verified reviews</div>
+              </div>
             </motion.div>
           </div>
 
-          <MatchPanel />
-        </div>
+          {/* RIGHT */}
 
-        <div className="hs__marquee-wrap">
-          <div className="hs__marquee">
-            {[...Array(2)].map((_, set) => (
-              <div className="hs__marquee" key={set} style={{ animation: "none" }}>
-                <span><MapPin size={11} />500+ Partner Universities</span>
-                <span>🇬🇧 United Kingdom</span>
-                <span>🇨🇦 Canada</span>
-                <span>🇦🇺 Australia</span>
-                <span>🇺🇸 United States</span>
-                <span>🇩🇪 Germany</span>
-                <span>🇮🇪 Ireland</span>
+          <motion.div
+            className="hs__right"
+            initial={{ opacity: 0, y: 32, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{
+              duration: 0.8,
+              delay: 0.18,
+              ease: [0.16, 1, 0.3, 1],
+            }}
+          >
+            <div className="hs__img-frame">
+              <img
+                src={heroImg}
+                alt="Students studying abroad"
+                className="hs__img"
+              />
+
+              <div className="hs__match">
+                <TrendingUp size={13} />
+
+                <span className="hs__match-text">96% Match Found</span>
               </div>
-            ))}
-          </div>
+
+              <div className="hs__uni">
+                <div className="hs__uni-icon">
+                  <GraduationCap size={16} />
+                </div>
+
+                <div>
+                  <div className="hs__uni-title">AI-Matched University</div>
+
+                  <div className="hs__uni-sub">
+                    Western University · Canada 🇨🇦
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="hs__countries">
+              {DESTINATIONS.map(({ flag, name, color }) => (
+                <div className="hs__country" key={name}>
+                  <span className="hs__flag-wrap" style={{ background: color }}>
+                    {flag}
+                  </span>
+
+                  <span className="hs__country-name">{name}</span>
+                </div>
+              ))}
+            </div>
+          </motion.div>
         </div>
       </section>
     </>
   );
 }
-
-

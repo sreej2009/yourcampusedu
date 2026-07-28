@@ -26,12 +26,13 @@ const quickLinks = [
   { label: "Home", link: "/" },
   { label: "About", link: "/about" },
   { label: "Courses", link: "/courses" },
-  { label: "Countries", link: "/countries" },
+  { label: "Study India", link: "/study-india" },
+  { label: "StudyDestination", link: "/study-destination" },
   { label: "Contact", link: "/contact" },
 ];
 
 const aiTools = [
-  { label: "AI Match", link: "/ai-match" },
+  { label: "AI Course Match", link: "/ai-course-match" },
   { label: "Eligibility Checker", link: "/eligibility-checker" },
   { label: "Budget Calculator", link: "/budget-calculator" },
   { label: "Compare Colleges", link: "/compare-colleges" },
@@ -309,8 +310,7 @@ const Footer = () => {
 
                     <p className="text-white/70 leading-relaxed text-[16px]">
 
-                      Chennai, Tamil Nadu,
-                      India
+                      2nd FLOOR, Classic Towers, SB, D.R.1270BCD, Trichy Rd, Race Course, Coimbatore, Tamil Nadu 641018
 
                     </p>
 
@@ -335,10 +335,18 @@ const Footer = () => {
                     </p>
 
                     <a
-                      href="tel:+919999999999"
+                      href="tel:+918680888184"
                       className="text-white/70 hover:text-white transition-all text-[16px]"
                     >
-                      +91 99999 99999
+                      +91 8680888184
+                    </a>
+<p />
+                     
+                    <a
+                      href="tel:+918680888185"
+                      className="text-white/70 hover:text-white transition-all text-[16px]"
+                    >
+                      +91 8680888185
                     </a>
 
                   </div>

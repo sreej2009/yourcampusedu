@@ -1,308 +1,293 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import { useRef } from "react";
 import { motion } from "framer-motion";
-import {
-  ArrowLeft,
-  Clock3,
-  CalendarDays,
-  IndianRupee,
-  ShieldCheck,
-  Sparkles,
-} from "lucide-react";
+import { PlaneTakeoff, ChevronDown } from "lucide-react";
 
-export default function CountryHero({ destination, details }) {
-  const { name, flag, code, tagline, image, duration, intake, avgCost, visaRate, topFields } =
-    destination;
+const container = {
+  hidden: {},
+  show: {
+    transition: { staggerChildren: 0.12, delayChildren: 0.2 },
+  },
+};
 
-  const stats = [
-    { icon: Clock3, label: "Duration", value: duration, accent: "var(--accent-blue)" },
-    { icon: CalendarDays, label: "Next intake", value: intake, accent: "var(--accent-green)" },
-    { icon: IndianRupee, label: "Total cost", value: avgCost, accent: "var(--secondary)" },
-    { icon: ShieldCheck, label: "Visa success", value: visaRate, accent: "var(--accent-pink)" },
-  ];
+const rise = {
+  hidden: { opacity: 0, y: 26 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } },
+};
+
+export default function CountryHero({ country }) {
+  const mediaRef = useRef(null);
+
+  const handleExplore = () => {
+    const target = document.getElementById("universities");
+    if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  const handlePointerMove = (e) => {
+    const el = mediaRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    el.style.setProperty("--mx", `${x}%`);
+    el.style.setProperty("--my", `${y}%`);
+  };
 
   return (
-    <section className="ctry-hero">
-      {/* Background */}
-      <div className="ctry-hero__bg">
-        <img src={image} alt={name} className="ctry-hero__img" />
-        <div className="ctry-hero__scrim" />
+    <section className="country-hero" onMouseMove={handlePointerMove}>
+      <div className="country-hero__media" ref={mediaRef} aria-hidden="true">
+        <motion.img
+          src={country.heroImage}
+          alt=""
+          className="country-hero__img"
+          initial={{ scale: 1.12, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
+        />
+        <div className="country-hero__scrim" />
+        <div className="country-hero__grain" />
+        <div className="country-hero__spotlight" />
       </div>
 
-      {/* Signature: oversized ghost country code */}
-      <span className="ctry-hero__ghost" aria-hidden="true">
-        {code}
-      </span>
-
-      {/* Top bar */}
-      <div className="ctry-hero__top">
-        <Link to="/study-destination" className="ctry-hero__back">
-          <ArrowLeft size={16} />
-          <span>All destinations</span>
-        </Link>
-
-        {details?.heroStamp && (
-          <div className="ctry-hero__badge">
-            <Sparkles size={13} />
-            <span>{details.heroStamp}</span>
-          </div>
-        )}
-      </div>
-
-      {/* Body */}
-      <div className="ctry-hero__body">
-        <motion.div
-          className="ctry-hero__intro"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <div className="ctry-hero__eyebrow">
-            <span className="ctry-hero__flag">{flag}</span>
-            <span>Study destination</span>
-          </div>
-          <h1>{name}</h1>
-          <p>{tagline}</p>
-
-          <div className="ctry-hero__cta">
-            <Link to="/apply" className="ctry-btn ctry-btn--primary">
-              Start application
-            </Link>
-            <Link to="/contact" className="ctry-btn ctry-btn--ghost">
-              Talk to a counselor
-            </Link>
-          </div>
+      <motion.div
+        className="country-hero__content"
+        variants={container}
+        initial="hidden"
+        animate="show"
+      >
+        <motion.div className="country-hero__eyebrow" variants={rise}>
+          <span className="country-hero__flag">{country.flag}</span>
+          <span className="country-hero__gate">{country.gate}</span>
+          <span className="country-hero__dot" />
+          <span>STUDY ABROAD</span>
         </motion.div>
 
-        <motion.aside
-          className="ctry-panel"
-          initial={{ opacity: 0, x: 40 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.7, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <div className="ctry-panel__head">
-            <span>Snapshot</span>
-          </div>
+        <motion.h1 className="country-hero__title" variants={rise}>
+          Study in <span className="country-hero__title-accent">{country.name}</span>
+        </motion.h1>
 
-          <div className="ctry-panel__stats">
-            {stats.map((s, i) => (
-              <motion.div
-                key={s.label}
-                className="ctry-panel__stat"
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.35 + i * 0.08 }}
-              >
-                <s.icon size={16} style={{ color: s.accent }} />
-                <div>
-                  <span>{s.label}</span>
-                  <strong>{s.value}</strong>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+        <motion.p className="country-hero__desc" variants={rise}>
+          {country.description}
+        </motion.p>
 
-          <div className="ctry-panel__fields">
-            <span className="ctry-panel__fields-label">Popular fields</span>
-            <div className="ctry-panel__chips">
-              {topFields.map((f) => (
-                <span key={f} className="ctry-chip">
-                  {f}
-                </span>
-              ))}
-            </div>
-          </div>
-        </motion.aside>
-      </div>
+        <motion.div className="country-hero__actions" variants={rise}>
+          <motion.button
+            type="button"
+            className="country-hero__cta"
+            whileHover={{ y: -3 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={handleExplore}
+          >
+            <span>Explore Universities</span>
+            <PlaneTakeoff size={18} strokeWidth={2.2} />
+          </motion.button>
+
+          <button type="button" className="country-hero__cta-ghost" onClick={handleExplore}>
+            View requirements
+          </button>
+        </motion.div>
+      </motion.div>
+
+      
 
       <style>{`
-        .ctry-hero {
+        .country-hero {
           position: relative;
-          font-family: var(--font-main);
-          height: 92vh;
-          min-height: 680px;
-          max-height: 940px;
+          min-height: 640px;
+          display: flex;   
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
           overflow: hidden;
-          color: var(--text-white);
+          border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+          isolation: isolate;
         }
 
-        /* Background */
-        .ctry-hero__bg { position: absolute; inset: 0; z-index: 0; }
-        .ctry-hero__img { width: 100%; height: 100%; object-fit: cover; display: block; }
-        .ctry-hero__scrim {
-          position: absolute; inset: 0;
-          background:
-            linear-gradient(180deg, rgba(17,24,34,0.55) 0%, rgba(17,24,34,0.28) 30%, rgba(17,24,34,0.35) 55%, rgba(17,24,34,0.92) 100%),
-            linear-gradient(90deg, rgba(17,24,34,0.55) 0%, rgba(17,24,34,0.05) 45%, rgba(17,24,34,0.05) 60%, rgba(17,24,34,0.55) 100%);
-        }
-
-        /* Ghost signature type */
-        .ctry-hero__ghost {
+        .country-hero__media {
           position: absolute;
-          top: -2.5vw;
-          right: 2vw;
-          z-index: 1;
-          font-size: clamp(7rem, 19vw, 15rem);
-          font-weight: 800;
-          line-height: 1;
-          letter-spacing: -0.05em;
-          color: rgba(255,255,255,0.07);
-          pointer-events: none;
-          user-select: none;
+          inset: 0;
+          z-index: -1;
+          --mx: 50%;
+          --my: 40%;
         }
 
-        /* Top bar */
-        .ctry-hero__top {
-          position: relative; z-index: 2;
-          display: flex; align-items: center; justify-content: space-between;
-          padding: 28px 32px 0;
-        }
-        .ctry-hero__back {
-          display: inline-flex; align-items: center; gap: 8px;
-          color: var(--text-white); text-decoration: none;
-          font-size: 0.85rem; font-weight: 500;
-          background: rgba(255,255,255,0.1);
-          border: 1px solid rgba(255,255,255,0.22);
-          backdrop-filter: blur(8px);
-          padding: 9px 16px; border-radius: var(--radius-lg);
-          transition: var(--transition);
-        }
-        .ctry-hero__back:hover { background: rgba(255,255,255,0.2); }
-
-        .ctry-hero__badge {
-          display: inline-flex; align-items: center; gap: 6px;
-          font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em;
-          color: var(--text-white);
-          background: rgba(255,255,255,0.1);
-          border: 1px solid rgba(255,255,255,0.22);
-          backdrop-filter: blur(8px);
-          padding: 8px 14px; border-radius: var(--radius-lg);
-        }
-        .ctry-hero__badge svg { color: var(--accent-pink); }
-
-        /* Body layout */
-        .ctry-hero__body {
-          position: relative; z-index: 2;
-          height: calc(100% - 84px);
-          max-width: 1400px; margin: 0 auto;
-          padding: 0 32px 56px;
-          display: flex; align-items: flex-end; justify-content: space-between;
-          gap: 48px;
-        }
-
-        .ctry-hero__intro { max-width: 620px; }
-
-        .ctry-hero__eyebrow {
-          display: inline-flex; align-items: center; gap: 10px;
-          font-size: 0.76rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase;
-          color: rgba(255,255,255,0.72);
-          margin-bottom: 18px;
-        }
-        .ctry-hero__flag { font-size: 1.1rem; line-height: 1; }
-
-        .ctry-hero__intro h1 {
-          font-size: clamp(2.6rem, 5.4vw, 4.4rem);
-          font-weight: 800; letter-spacing: -0.03em; line-height: 0.98;
-          margin: 0 0 16px;
-        }
-        .ctry-hero__intro p {
-          font-size: clamp(1rem, 1.6vw, 1.15rem);
-          font-weight: 400; line-height: 1.55;
-          color: rgba(255,255,255,0.82);
-          margin: 0 0 32px;
-          max-width: 520px;
-        }
-
-        .ctry-hero__cta { display: flex; gap: 14px; flex-wrap: wrap; }
-        .ctry-btn {
-          font-family: var(--font-main);
-          font-size: 0.92rem; font-weight: 600;
-          padding: 14px 28px; border-radius: var(--radius-lg);
-          text-decoration: none; text-align: center;
-          transition: var(--transition);
-          display: inline-flex; align-items: center; justify-content: center;
-        }
-        .ctry-btn--primary {
-          background: var(--gradient-secondary); color: var(--text-white);
-          box-shadow: var(--shadow-lg);
-        }
-        .ctry-btn--primary:hover { transform: translateY(-2px); }
-        .ctry-btn--ghost {
-          background: rgba(255,255,255,0.08); color: var(--text-white);
-          border: 1.5px solid rgba(255,255,255,0.35);
-          backdrop-filter: blur(8px);
-        }
-        .ctry-btn--ghost:hover { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.55); }
-
-        /* Snapshot panel */
-        .ctry-panel {
-          flex-shrink: 0;
-          width: 360px;
-          background: rgba(17,24,34,0.58);
-          border: 1px solid rgba(255,255,255,0.16);
-          backdrop-filter: blur(22px);
-          border-radius: var(--radius-xl);
-          box-shadow: var(--shadow-lg);
-          padding: 26px 26px 22px;
-        }
-
-        .ctry-panel__head {
-          font-size: 0.7rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase;
-          color: rgba(255,255,255,0.55);
-          margin-bottom: 18px;
-        }
-
-        .ctry-panel__stats {
-          display: grid; grid-template-columns: 1fr 1fr; gap: 18px 16px;
-          padding-bottom: 18px;
-          border-bottom: 1px solid rgba(255,255,255,0.14);
-          margin-bottom: 18px;
-        }
-        .ctry-panel__stat { display: flex; align-items: flex-start; gap: 8px; }
-        .ctry-panel__stat div { display: flex; flex-direction: column; }
-        .ctry-panel__stat span {
-          font-size: 0.68rem; color: rgba(255,255,255,0.55); font-weight: 500; margin-bottom: 3px;
-        }
-        .ctry-panel__stat strong { font-size: 0.94rem; font-weight: 700; color: var(--text-white); }
-
-        .ctry-panel__fields-label {
+        .country-hero__img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
           display: block;
-          font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
-          color: rgba(255,255,255,0.55);
-          margin-bottom: 10px;
-        }
-        .ctry-panel__chips { display: flex; flex-wrap: wrap; gap: 8px; }
-        .ctry-chip {
-          font-size: 0.74rem; font-weight: 600; color: var(--text-white);
-          background: rgba(255,255,255,0.12);
-          border: 1px solid rgba(255,255,255,0.18);
-          padding: 5px 12px; border-radius: var(--radius-sm);
         }
 
-        /* Responsive */
-        @media (max-width: 1024px) {
-          .ctry-hero__body { flex-direction: column; align-items: stretch; gap: 28px; }
-          .ctry-panel { width: 100%; }
-          .ctry-hero { height: auto; min-height: 0; max-height: none; padding-bottom: 40px; }
-          .ctry-hero__ghost { font-size: clamp(5rem, 24vw, 9rem); top: -1vw; }
+        .country-hero__scrim {
+          position: absolute;
+          inset: 0;
+          background:
+            linear-gradient(180deg, color-mix(in srgb, var(--primary-dark) 34%, transparent) 0%, color-mix(in srgb, var(--primary-dark) 54%, transparent) 55%, color-mix(in srgb, var(--primary-dark) 76%, transparent) 100%),
+            linear-gradient(100deg, color-mix(in srgb, var(--primary-dark) 50%, transparent) 0%, transparent 62%);
         }
 
-        @media (max-width: 640px) {
-          .ctry-hero__top { padding: 22px 20px 0; }
-          .ctry-hero__body { padding: 0 20px 40px; }
-          .ctry-hero__bg { position: relative; height: 46vh; min-height: 320px; }
-          .ctry-hero { height: auto; }
-          .ctry-hero__scrim {
-            background: linear-gradient(180deg, rgba(17,24,34,0.4) 0%, rgba(17,24,34,0.95) 100%);
+        .country-hero__grain {
+          position: absolute;
+          inset: 0;
+          background: radial-gradient(circle at 18% 12%, color-mix(in srgb, var(--accent-green) 16%, transparent) 0%, transparent 42%),
+            radial-gradient(circle at 88% 82%, color-mix(in srgb, var(--extra-purple) 20%, transparent) 0%, transparent 48%);
+        }
+
+        .country-hero__spotlight {
+          position: absolute;
+          inset: 0;
+          background: radial-gradient(420px circle at var(--mx) var(--my), color-mix(in srgb, var(--white) 14%, transparent) 0%, transparent 68%);
+          transition: background-position 0.1s ease-out;
+          pointer-events: none;
+        }
+
+        .country-hero__content {
+          position: relative;
+          width: 100%;
+          max-width: 760px;
+          margin: 0 auto;
+          padding: clamp(4.5rem, 11vw, 7rem) clamp(1.25rem, 4vw, 2.5rem) clamp(4rem, 9vw, 5.5rem);
+          color: var(--text-white);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+        }
+
+        .country-hero__eyebrow {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.6rem;
+          font-family: var(--font-main);
+          font-size: 0.78rem;
+          font-weight: 600;
+          letter-spacing: 0.16em;
+          color: color-mix(in srgb, var(--text-white) 82%, transparent);
+          background: color-mix(in srgb, var(--white) 12%, transparent);
+          border: 1px solid color-mix(in srgb, var(--white) 24%, transparent);
+          padding: 0.5rem 1.1rem;
+          border-radius: 999px;
+          backdrop-filter: blur(6px);
+          margin-bottom: 1.6rem;
+        }
+
+        .country-hero__flag {
+          font-size: 1.1rem;
+          line-height: 1;
+        }
+
+        .country-hero__gate {
+          color: var(--accent-green);
+          font-weight: 700;
+        }
+
+        .country-hero__dot {
+          width: 4px;
+          height: 4px;
+          border-radius: 50%;
+          background: color-mix(in srgb, var(--white) 50%, transparent);
+        }
+
+        .country-hero__title {
+          font-family: var(--font-main);
+          font-weight: 700;
+          font-size: clamp(2.4rem, 6vw, 4.25rem);
+          line-height: 1.08;
+          margin: 0 0 1.2rem;
+          letter-spacing: -0.02em;
+        }
+
+        .country-hero__title-accent {
+          background: var(--gradient-primary);
+          -webkit-background-clip: text;
+          background-clip: text;
+          color: transparent;
+        }
+
+        .country-hero__desc {
+          font-family: var(--font-main);
+          font-size: clamp(0.98rem, 1.5vw, 1.12rem);
+          line-height: 1.7;
+          color: color-mix(in srgb, var(--text-white) 88%, transparent);
+          max-width: 560px;
+          margin: 0 0 2.4rem;
+        }
+
+        .country-hero__actions {
+          display: flex;
+          align-items: center;
+          gap: 1.4rem;
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+
+        .country-hero__cta {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.6rem;
+          font-family: var(--font-main);
+          font-weight: 600;
+          font-size: 0.95rem;
+          color: var(--text-white);
+          background: var(--gradient-primary);
+          border: none;
+          padding: 1rem 1.85rem;
+          border-radius: var(--radius-md);
+          cursor: pointer;
+          box-shadow: var(--shadow-lg);
+          transition: var(--transition);
+        }
+
+        .country-hero__cta:hover {
+          box-shadow: 0 18px 40px color-mix(in srgb, var(--primary) 45%, transparent);
+        }
+
+        .country-hero__cta-ghost {
+          font-family: var(--font-main);
+          font-weight: 600;
+          font-size: 0.92rem;
+          color: var(--text-white);
+          background: transparent;
+          border: none;
+          border-bottom: 1px solid color-mix(in srgb, var(--white) 45%, transparent);
+          padding: 0.3rem 0;
+          cursor: pointer;
+          transition: var(--transition);
+        }
+
+        .country-hero__cta-ghost:hover {
+          border-color: var(--accent-green);
+          color: var(--accent-green);
+        }
+
+        .country-hero__scroll {
+          position: absolute;
+          bottom: 1.5rem;
+          left: 50%;
+          transform: translateX(-50%);
+          color: color-mix(in srgb, var(--text-white) 70%, transparent);
+        }
+
+        @media (max-width: 560px) {
+          .country-hero {
+            min-height: 560px;
           }
-          .ctry-hero__ghost { display: none; }
-          .ctry-panel__stats { grid-template-columns: 1fr 1fr; }
-          .ctry-hero__cta { flex-direction: column; }
-          .ctry-btn { width: 100%; }
+          .country-hero__actions {
+            flex-direction: column;
+            align-items: stretch;
+          }
+          .country-hero__cta {
+            justify-content: center;
+          }
+          .country-hero__cta-ghost {
+            text-align: center;
+          }
         }
 
         @media (prefers-reduced-motion: reduce) {
-          .ctry-hero * { animation: none !important; transition: none !important; }
+          .country-hero * {
+            animation: none !important;
+            transition: none !important;
+          }
         }
       `}</style>
     </section>
