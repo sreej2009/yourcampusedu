@@ -23,6 +23,8 @@ import CollegeList from "./pages/study-india/CollegeList";
 import CountryDetails from "./pages/CountryDetails";
 import Accommodation from "./pages/Accommodation";
 import AccommodationCitySelection from "./pages/accommodation/CitySelection";
+import MbbsAbroad from "./pages/MbbsAbroad";
+import MbbsCountryDetails from "./pages/mbbs-abroad/MbbsCountryDetails";
 
 function App() {
   const location = useLocation();
@@ -60,6 +62,8 @@ function App() {
         <Route path="/study-india/colleges/:stateId/:cityId" element={<CollegeList />}/>
         <Route path="/accommodation" element={<Accommodation />} />
         <Route path="/accommodation/:countryId" element={<AccommodationCitySelection />} />
+        <Route path="/mbbs-abroad" element={<MbbsAbroad />} /> 
+        <Route path="/mbbs-abroad/:countrySlug"element={<MbbsCountryDetails />}/>
         {/* TODO: add /accommodation/:countryId/:cityId once the listings page exists —
             CityGrid rows already link there */}
 

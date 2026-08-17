@@ -15,7 +15,7 @@ import {
   Search,
   X,
 } from "lucide-react";
-import { destinations, origin } from "../../data/countryDetails";
+import { destinations, origin } from "../../Data/countryDetails";
 
 // 50m resolution — needed at this zoom level so small countries
 // (Malta, Cyprus, Baltics, Balkans) don't render blocky/jagged.
@@ -41,7 +41,6 @@ const EUROPE_FIT_WIDTH_FRACTION = 0.78;
 const MAP_PADDING = 40;
 
 const FLIGHT_DURATION = 1700; // ms, plane flight-in
-const ROUTE_DRAW_DURATION = 1.1; // s, framer-motion route draw-in
 const ZOOM_SCALE = 1.42; // how far the map pans/zooms toward a selected country
 
 // Region grouping — the pill list below reads like a real departure
@@ -121,41 +120,17 @@ const REGION_MAP = {
 const easeInOutCubic = (t) =>
   t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
-// ---- Quadratic bezier helpers for the flight route ----
-// Everything here operates in projected pixel space, not lon/lat —
-// that's what makes the curve look like a clean, consistent "flight
-// path" arc no matter which country is selected.
+// ---- Straight-line flight helpers (lon/lat space) ----
+// The plane lerps directly between origin and destination coordinates,
+// with a small sine bump on latitude so the flight still reads as an
+// "arc" rather than a die-straight line.
 
-const arcControlPoint = (p0, p2, bow = 0.26) => {
-  const mx = (p0[0] + p2[0]) / 2;
-  const my = (p0[1] + p2[1]) / 2;
-  const dx = p2[0] - p0[0];
-  const dy = p2[1] - p0[1];
-  const dist = Math.hypot(dx, dy) || 1;
-  let nx = -dy / dist;
-  let ny = dx / dist;
-  // Always bow upward (toward smaller y) for a consistent, pleasant arc.
-  if (ny > 0) {
-    nx = -nx;
-    ny = -ny;
-  }
-  const offset = dist * bow;
-  return [mx + nx * offset, my + ny * offset];
-};
+const lerp = (a, b, t) => a + (b - a) * t;
 
-const arcPoint = (p0, p1, p2, t) => {
-  const mt = 1 - t;
-  return [
-    mt * mt * p0[0] + 2 * mt * t * p1[0] + t * t * p2[0],
-    mt * mt * p0[1] + 2 * mt * t * p1[1] + t * t * p2[1],
-  ];
-};
-
-const arcTangentAngle = (p0, p1, p2, t) => {
-  const mt = 1 - t;
-  const dx = 2 * mt * (p1[0] - p0[0]) + 2 * t * (p2[0] - p1[0]);
-  const dy = 2 * mt * (p1[1] - p0[1]) + 2 * t * (p2[1] - p1[1]);
-  return (Math.atan2(dy, dx) * 180) / Math.PI;
+const bearing = (from, to) => {
+  const dLon = to.lon - from.lon;
+  const dLat = to.lat - from.lat;
+  return (Math.atan2(dLat, dLon) * 180) / Math.PI;
 };
 
 const WorldMap = () => {
@@ -166,7 +141,8 @@ const WorldMap = () => {
   const [selectedId, setSelectedId] = useState(null);
   const [flying, setFlying] = useState(false);
   const [arrived, setArrived] = useState(false);
-  const [planeT, setPlaneT] = useState(0);
+  const [planePos, setPlanePos] = useState(origin.coords);
+  const [planeAngle, setPlaneAngle] = useState(0);
   const [query, setQuery] = useState("");
   const rafRef = useRef(null);
 
@@ -226,24 +202,24 @@ const WorldMap = () => {
     );
   }, [projection]);
 
-  const route = useMemo(() => {
-    if (!selected || !originXY || !destXY[selected.id]) return null;
-    const p0 = originXY;
-    const p2 = destXY[selected.id];
-    const p1 = arcControlPoint(p0, p2);
-    return { p0, p1, p2, d: `M ${p0[0]} ${p0[1]} Q ${p1[0]} ${p1[1]} ${p2[0]} ${p2[1]}` };
-  }, [selected, originXY, destXY]);
-
-  const flyTo = useCallback(() => {
+  const flyTo = useCallback((dest) => {
     cancelAnimationFrame(rafRef.current);
     setArrived(false);
     setFlying(true);
-    setPlaneT(0);
+    setPlaneAngle(bearing(origin.coords, dest.coords));
 
     const start = performance.now();
+
     const step = (now) => {
       const raw = Math.min((now - start) / FLIGHT_DURATION, 1);
-      setPlaneT(easeInOutCubic(raw));
+      const t = easeInOutCubic(raw);
+      const arc = Math.sin(Math.PI * t) * 8;
+
+      setPlanePos({
+        lon: lerp(origin.coords.lon, dest.coords.lon, t),
+        lat: lerp(origin.coords.lat, dest.coords.lat, t) + arc,
+      });
+
       if (raw < 1) {
         rafRef.current = requestAnimationFrame(step);
       } else {
@@ -251,24 +227,21 @@ const WorldMap = () => {
         setArrived(true);
       }
     };
+
     rafRef.current = requestAnimationFrame(step);
   }, []);
 
   const handleSelect = (dest) => {
     if (flying) return;
     setSelectedId(dest.id);
-    flyTo();
+    flyTo(dest);
   };
 
   useEffect(() => () => cancelAnimationFrame(rafRef.current), []);
 
-  const planePoint = useMemo(
-    () => (route ? arcPoint(route.p0, route.p1, route.p2, planeT) : null),
-    [route, planeT]
-  );
-  const planeAngle = useMemo(
-    () => (route ? arcTangentAngle(route.p0, route.p1, route.p2, planeT) : 0),
-    [route, planeT]
+  const planeXY = useMemo(
+    () => (projection ? projection([planePos.lon, planePos.lat]) : null),
+    [projection, planePos]
   );
 
   // Smoothly pan + zoom the whole map group toward the selected country.
@@ -477,54 +450,20 @@ const WorldMap = () => {
                   );
                 })}
 
-                {/* Flight route: draws in, plane flies along it, then
-                    ambient particles loop along it while a country stays selected. */}
-                <AnimatePresence>
-                  {route && (
-                    <g key={selectedId}>
-                      <path
-                        id={`sdRoutePath-${selectedId}`}
-                        d={route.d}
-                        fill="none"
-                        stroke="transparent"
-                      />
-                      <motion.path
-                        d={route.d}
-                        fill="none"
-                        stroke="var(--accent-blue)"
-                        strokeWidth={2}
-                        strokeLinecap="round"
-                        style={{ filter: "drop-shadow(0 0 4px var(--accent-blue))" }}
-                        initial={{ pathLength: 0, opacity: 0 }}
-                        animate={{ pathLength: 1, opacity: 0.9 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: ROUTE_DRAW_DURATION, ease: "easeInOut" }}
-                      />
-
-                      {arrived &&
-                        [0, 1, 2].map((i) => (
-                          <circle key={i} r={2.4} fill="var(--white)">
-                            <animateMotion
-                              dur="2.6s"
-                              begin={`${i * 0.7}s`}
-                              repeatCount="indefinite"
-                              rotate="auto"
-                            >
-                              <mpath href={`#sdRoutePath-${selectedId}`} />
-                            </animateMotion>
-                            <animate
-                              attributeName="opacity"
-                              values="0;1;1;0"
-                              keyTimes="0;0.15;0.85;1"
-                              dur="2.6s"
-                              begin={`${i * 0.7}s`}
-                              repeatCount="indefinite"
-                            />
-                          </circle>
-                        ))}
-                    </g>
-                  )}
-                </AnimatePresence>
+                {/* Flight route: a simple dashed line from India to the
+                    selected destination — the plane flies straight along it. */}
+                {selected && originXY && destXY[selected.id] && (
+                  <line
+                    x1={originXY[0]}
+                    y1={originXY[1]}
+                    x2={destXY[selected.id][0]}
+                    y2={destXY[selected.id][1]}
+                    stroke="var(--accent-blue)"
+                    strokeWidth={1.8}
+                    strokeDasharray="4 5"
+                    strokeLinecap="round"
+                  />
+                )}
 
                 {/* India — always-on glowing origin marker */}
                 {originXY && (
@@ -538,9 +477,9 @@ const WorldMap = () => {
                   </g>
                 )}
 
-                {/* Plane, flying */}
-                {flying && planePoint && (
-                  <g transform={`translate(${planePoint[0]}, ${planePoint[1]}) rotate(${planeAngle})`}>
+                {/* Plane — visible while flying and once it has arrived */}
+                {(flying || arrived) && planeXY && (
+                  <g transform={`translate(${planeXY[0]}, ${planeXY[1]}) rotate(${planeAngle})`}>
                     <foreignObject x={-11} y={-11} width={22} height={22}>
                       <div style={{ color: "var(--secondary)", display: "flex", alignItems: "center", justifyContent: "center", filter: "drop-shadow(0 0 4px var(--secondary))" }}>
                         <Plane size={20} fill="var(--secondary)" strokeWidth={1.5} />

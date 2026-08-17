@@ -4,14 +4,14 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   Menu, X, ChevronDown, ChevronRight, ChevronLeft, UserPlus, Sparkles,
   Target, CheckCircle, Wallet, BarChart2, Globe,
-  ArrowRight, Zap, GraduationCap, Phone,
+  ArrowRight, Zap, GraduationCap, Phone, Stethoscope,
 } from "lucide-react";
 import logo from "../../assets/images/logo.png";
 
 // NOTE: adjust these two import paths to match where the files actually live
 // in your project (they were referenced as indianCourses.js / categoryData.js).
-import { courseCategories } from "../../data/indianCourses";
-import { categoryData } from "../../data/categoryData";
+import { courseCategories } from "../../Data/indianCourses";
+import { categoryData } from "../../Data/categoryData";
 
 /* =========================================
    DATA
@@ -28,9 +28,12 @@ const NAV_LINKS_LEFT = [
   { to: "/courses", label: "Courses"             },
 ];
 
+// ── MBBS Abroad added here — it will now automatically render in the
+// desktop nav (mapped below) since it lives in NAV_LINKS_RIGHT.
 const NAV_LINKS_RIGHT = [
   { to: "/study-destination", label: "StudyDestination" },
   { to: "/accommodation",     label: "Accommodation"    },
+  { to: "/mbbs-abroad",       label: "MBBS Abroad"      },
 ];
 
 const ALL_SIMPLE_LINKS = [...NAV_LINKS_LEFT, ...NAV_LINKS_RIGHT];
@@ -1564,6 +1567,7 @@ export default function Navbar() {
 
             <span className="nb__sep" aria-hidden="true" />
 
+            {/* ── This map now renders StudyDestination, Accommodation, AND MBBS Abroad automatically ── */}
             {NAV_LINKS_RIGHT.map(({ to, label }) => (
               <Link key={to} to={to}
                 className={`nb__link${activeLink === to ? " active" : ""}`}>
@@ -1764,6 +1768,16 @@ export default function Navbar() {
                   {activeLink === "/accommodation" && <span className="nbm__linkDot" aria-hidden="true" />}
                 </Link>
 
+                {/* ── MBBS Abroad added to mobile drawer here ── */}
+                <Link to="/mbbs-abroad" onClick={closeMobile}
+                  className={`nbm__link${activeLink === "/mbbs-abroad" ? " active" : ""}`}>
+                  <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <Stethoscope size={16} style={{ flexShrink: 0 }} />
+                    MBBS Abroad
+                  </span>
+                  {activeLink === "/mbbs-abroad" && <span className="nbm__linkDot" aria-hidden="true" />}
+                </Link>
+
                 <div className={`nbm__expandRow${isAiActive ? " active" : ""}`}>
                   <Link to="/ai-tools" onClick={closeMobile} className="nbm__expandMain">
                     <div className="nbm__expandIcon"><Sparkles size={18} /></div>
@@ -1943,4 +1957,4 @@ export default function Navbar() {
       </aside>
     </>
   );
-}
+} 
