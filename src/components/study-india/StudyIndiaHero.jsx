@@ -1,343 +1,177 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Landmark, MapPin, GraduationCap } from "lucide-react";
-import heroBg from "../../assets/images/studyindia_hero.png";
+import { ArrowRight, MapPin, GraduationCap, Landmark, Ticket } from "lucide-react";
+import heroBackground from "../../assets/images/studyindia_hero.png";
 
-const STATS = [
-  { icon: Landmark, value: "1,400+", label: "Institutes Mapped" },
-  { icon: MapPin, value: "28", label: "States Covered" },
-  { icon: GraduationCap, value: "72%", label: "Avg. Cost vs Abroad" },
+const stats = [
+  { label: "Institutes Mapped", value: "1,400+", icon: Landmark },
+  { label: "States Covered", value: "28", icon: MapPin },
+  { label: "Avg. Cost vs Abroad", value: "72%", icon: GraduationCap },
 ];
 
-function StudyIndiaHero() {
+const headlineLines = [
+  { text: "Every State.", accent: false },
+  { text: "One Campus Search.", accent: true },
+];
+
+const lineVariants = {
+  hidden: { opacity: 0, y: 26 },
+  visible: (i) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: 0.15 + i * 0.14, duration: 0.65, ease: [0.22, 1, 0.36, 1] },
+  }),
+};
+
+export default function StudyIndiaHero() {
   return (
-    <section className="sih-root">
-      <div className="sih-bg" style={{ backgroundImage: `url(${heroBg})` }} />
-      <div className="sih-scrim" />
-
-      <div className="sih-container">
-        <div className="sih-content">
-          <motion.div
-            className="sih-badge"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <span className="sih-badge-dot" />
-            Domestic Admissions Desk · Coimbatore
-          </motion.div>
-
-          <motion.h1
-            className="sih-title"
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, delay: 0.08 }}
-          >
-            <span className="sih-title-line">Every state.</span>
-            <span className="sih-title-accent">One campus search.</span>
-          </motion.h1>
-
-          <motion.p
-            className="sih-description"
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, delay: 0.18 }}
-          >
-            Compare NIRF-ranked colleges, real fee ranges, and placement
-            data across every state — built for students who want a
-            world-class degree without leaving home.
-          </motion.p>
-
-          <motion.div
-            className="sih-buttons"
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, delay: 0.28 }}
-          >
-            <a href="/study-india/colleges" className="sih-btn-primary">
-              Explore Colleges
-              <ArrowRight size={18} className="sih-btn-arrow" />
-            </a>
-            <a href="/ai-tools/country-fit-quiz" className="sih-btn-secondary">
-              Take the Fit Quiz
-            </a>
-          </motion.div>
-
-          <motion.p
-            className="sih-trust"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.36 }}
-          >
-            No fees for your first consultation
-          </motion.p>
-
-          <motion.div
-            className="sih-stats"
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, delay: 0.42 }}
-          >
-            {STATS.map((s, i) => (
-              <React.Fragment key={s.label}>
-                <div className="sih-stat">
-                  <div className="sih-stat-icon">
-                    <s.icon size={16} />
-                  </div>
-                  <div className="sih-stat-text">
-                    <span className="sih-stat-value">{s.value}</span>
-                    <span className="sih-stat-label">{s.label}</span>
-                  </div>
-                </div>
-                {i < STATS.length - 1 && <span className="sih-stat-divider" />}
-              </React.Fragment>
-            ))}
-          </motion.div>
-        </div>
-      </div>
-
-      <style>{`
-        .sih-root {
-          position: relative;
-          overflow: hidden;
-          min-height: 680px;
-          display: flex;
-          align-items: center;
-          padding: 150px 24px 90px;
-          background: var(--bg-light);
-          font-family: var(--font-main);
-        }
-
-        .sih-bg {
-          position: absolute;
-          inset: 0;
-          background-size: cover;
-          background-position: center;
-        }
-
-        .sih-scrim {
-          position: absolute;
-          inset: 0;
+    <section
+      className="relative overflow-hidden px-6 py-24 md:py-32"
+      style={{ fontFamily: "var(--font-main)" }}
+    >
+      {/* background image — same treatment as AIToolsHero */}
+      <img
+        src={heroBackground}
+        alt=""
+        className="absolute inset-0 h-full w-full object-cover"
+      />
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
           background:
-            linear-gradient(100deg,
-              var(--bg-light) 0%,
-              color-mix(in srgb, var(--bg-light) 92%, transparent) 32%,
-              color-mix(in srgb, var(--bg-light) 55%, transparent) 52%,
-              color-mix(in srgb, var(--bg-light) 15%, transparent) 72%,
-              transparent 100%
-            ),
-            linear-gradient(0deg,
-              color-mix(in srgb, var(--bg-light) 40%, transparent) 0%,
-              transparent 30%
-            );
-        }
+            "linear-gradient(135deg, rgba(248,245,255,0.65) 0%, rgba(243,238,255,0.55) 50%, rgba(255,255,255,0.45) 100%)",
+        }}
+      />
 
-        .sih-container {
-          position: relative;
-          z-index: 2;
-          width: 100%;
-          max-width: 1240px;
-          margin: 0 auto;
-        }
+      <div className="relative mx-auto max-w-4xl text-center">
+        <motion.span
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="mb-6 inline-flex items-center gap-2 rounded-full px-4 py-2"
+          style={{
+            background: "color-mix(in srgb, var(--accent-green) 16%, transparent)",
+            color: "var(--primary-dark)",
+            border: "1px solid color-mix(in srgb, var(--accent-green) 45%, transparent)",
+            fontSize: "0.8rem",
+            fontWeight: 600,
+            letterSpacing: "0.02em",
+          }}
+        >
+          <Ticket size={14} style={{ color: "var(--accent-green)" }} />
+          Domestic Admissions Desk
+        </motion.span>
 
-        .sih-content { text-align: left; max-width: 570px; }
+        <h1
+          style={{
+            fontSize: "clamp(2.2rem, 4.4vw, 3.4rem)",
+            fontWeight: 700,
+            lineHeight: 1.14,
+            letterSpacing: "-0.01em",
+          }}
+        >
+          {headlineLines.map((line, i) => (
+            <motion.span
+              key={line.text}
+              custom={i}
+              initial="hidden"
+              animate="visible"
+              variants={lineVariants}
+              className="block"
+              style={
+                line.accent
+                  ? {
+                      backgroundImage: "var(--gradient-primary)",
+                      WebkitBackgroundClip: "text",
+                      backgroundClip: "text",
+                      color: "transparent",
+                    }
+                  : { color: "var(--primary-dark)" }
+              }
+            >
+              {line.text}
+            </motion.span>
+          ))}
+        </h1>
 
-        .sih-badge {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          padding: 8px 18px;
-          border-radius: 999px;
-          background: var(--white);
-          border: 1px solid var(--border);
-          color: var(--primary-dark);
-          font-size: 0.8rem;
-          font-weight: 600;
-          letter-spacing: 0.02em;
-          margin-bottom: 26px;
-          box-shadow: var(--shadow-sm);
-        }
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6, duration: 0.6 }}
+          className="mx-auto mt-6 max-w-2xl"
+          style={{ color: "var(--text-medium)", fontSize: "1rem", lineHeight: 1.75 }}
+        >
+          Compare NIRF-ranked colleges, real fee ranges, and placement data
+          across every state — built for students who want a world-class
+          degree without leaving home.
+        </motion.p>
 
-        .sih-badge-dot {
-          width: 6px;
-          height: 6px;
-          border-radius: 50%;
-          background: var(--accent-green);
-          flex-shrink: 0;
-        }
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8, duration: 0.5 }}
+          className="mt-9 flex flex-wrap items-center justify-center gap-4"
+        >
+          <button
+            className="group flex items-center gap-2 rounded-full px-7 py-3.5 transition-transform hover:-translate-y-0.5"
+            style={{
+              background: "var(--gradient-primary)",
+              color: "var(--text-white)",
+              boxShadow: "var(--shadow-md)",
+              fontSize: "0.95rem",
+              fontWeight: 600,
+            }}
+          >
+            Explore Colleges
+            <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+          </button>
+          <button
+            className="rounded-full px-7 py-3.5 transition-colors"
+            style={{
+              color: "var(--primary-dark)",
+              border: "1px solid color-mix(in srgb, var(--primary-dark) 35%, transparent)",
+              fontSize: "0.95rem",
+              fontWeight: 600,
+            }}
+          >
+            Take the Fit Quiz
+          </button>
+        </motion.div>
 
-        .sih-title {
-          display: flex;
-          flex-direction: column;
-          font-size: clamp(2.15rem, 3.8vw, 3.5rem);
-          font-weight: 800;
-          line-height: 1.14;
-          letter-spacing: -0.02em;
-          color: var(--primary-dark);
-          margin-bottom: 22px;
-        }
-
-        .sih-title-line { display: block; }
-
-        .sih-title-accent {
-          display: block;
-          background: var(--gradient-primary);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-        }
-
-        .sih-description {
-          color: var(--text-medium);
-          line-height: 1.75;
-          font-size: 1.05rem;
-          max-width: 460px;
-          margin-bottom: 30px;
-        }
-
-        .sih-buttons {
-          display: flex;
-          gap: 14px;
-          flex-wrap: wrap;
-          margin-bottom: 14px;
-        }
-
-        .sih-btn-primary {
-          display: inline-flex;
-          align-items: center;
-          gap: 10px;
-          padding: 15px 26px;
-          background: var(--primary-dark);
-          color: var(--white);
-          text-decoration: none;
-          border-radius: 999px;
-          font-weight: 600;
-          font-size: 0.95rem;
-          transition: var(--transition);
-        }
-
-        .sih-btn-primary:hover { background: var(--primary); transform: translateY(-2px); }
-        .sih-btn-primary:hover .sih-btn-arrow { transform: translateX(3px); }
-
-        .sih-btn-arrow { transition: var(--transition); }
-
-        .sih-btn-secondary {
-          display: inline-flex;
-          align-items: center;
-          padding: 15px 26px;
-          border: 1px solid var(--border);
-          border-radius: 999px;
-          text-decoration: none;
-          color: var(--primary-dark);
-          font-weight: 600;
-          font-size: 0.95rem;
-          background: var(--white);
-          transition: var(--transition);
-        }
-
-        .sih-btn-secondary:hover { border-color: var(--primary); color: var(--primary); }
-
-        .sih-btn-primary:focus-visible,
-        .sih-btn-secondary:focus-visible {
-          outline: 2px solid var(--primary);
-          outline-offset: 3px;
-        }
-
-        .sih-trust {
-          font-size: 0.82rem;
-          color: var(--text-light);
-          font-weight: 500;
-          margin-bottom: 36px;
-        }
-
-        /* Stats */
-        .sih-stats {
-          display: flex;
-          align-items: center;
-          gap: 22px;
-          flex-wrap: wrap;
-        }
-
-        .sih-stat {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-        }
-
-        .sih-stat-icon {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 34px;
-          height: 34px;
-          flex-shrink: 0;
-          border-radius: var(--radius-sm);
-          background: var(--primary-light);
-          color: var(--primary-dark);
-        }
-
-        .sih-stat-text { display: flex; flex-direction: column; gap: 1px; }
-
-        .sih-stat-value {
-          font-size: 1.15rem;
-          font-weight: 800;
-          color: var(--primary-dark);
-          letter-spacing: -0.01em;
-          line-height: 1.2;
-        }
-
-        .sih-stat-label {
-          font-size: 0.74rem;
-          color: var(--text-light);
-          font-weight: 500;
-        }
-
-        .sih-stat-divider {
-          width: 1px;
-          height: 30px;
-          background: var(--border);
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .sih-btn-primary:hover,
-          .sih-btn-primary:hover .sih-btn-arrow { transform: none; }
-        }
-
-        /* ── Tablet ── */
-        @media (max-width: 980px) {
-          .sih-root { padding: 130px 22px 80px; min-height: 600px; }
-          .sih-scrim {
-            background:
-              linear-gradient(180deg,
-                var(--bg-light) 0%,
-                color-mix(in srgb, var(--bg-light) 90%, transparent) 40%,
-                color-mix(in srgb, var(--bg-light) 60%, transparent) 68%,
-                color-mix(in srgb, var(--bg-light) 20%, transparent) 100%
-              );
-          }
-          .sih-content { max-width: 100%; text-align: center; margin: 0 auto; }
-          .sih-description { margin-left: auto; margin-right: auto; }
-          .sih-buttons { justify-content: center; }
-          .sih-trust { text-align: center; }
-          .sih-stats { justify-content: center; }
-        }
-
-        /* ── Mobile ── */
-        @media (max-width: 576px) {
-          .sih-root { padding: 112px 18px 72px; min-height: 560px; }
-          .sih-title { font-size: 2rem; }
-          .sih-description { font-size: 0.95rem; }
-          .sih-buttons { flex-direction: column; width: 100%; }
-          .sih-btn-primary, .sih-btn-secondary { justify-content: center; width: 100%; }
-          .sih-trust { margin-bottom: 28px; }
-          .sih-stats { gap: 14px; justify-content: space-between; width: 100%; }
-          .sih-stat { flex-direction: column; align-items: center; text-align: center; gap: 6px; }
-          .sih-stat-text { align-items: center; }
-          .sih-stat-divider { display: none; }
-        }
-      `}</style>
+        {/* stat row */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1, duration: 0.6 }}
+          className="mx-auto mt-14 flex max-w-2xl flex-wrap items-center justify-center gap-x-10 gap-y-5"
+        >
+          {stats.map(({ label, value, icon: Icon }, i) => (
+            <div key={label} className="flex items-center gap-3">
+              {i !== 0 && (
+                <span
+                  className="hidden h-8 w-px sm:block"
+                  style={{ background: "color-mix(in srgb, var(--primary-dark) 18%, transparent)" }}
+                />
+              )}
+              <Icon size={18} style={{ color: "var(--accent-green)" }} />
+              <div className="text-left">
+                <span
+                  className="block"
+                  style={{ color: "var(--primary-dark)", fontSize: "1.25rem", fontWeight: 700 }}
+                >
+                  {value}
+                </span>
+                <span
+                  className="block"
+                  style={{ color: "var(--text-medium)", fontSize: "0.72rem", fontWeight: 500 }}
+                >
+                  {label}
+                </span>
+              </div>
+            </div>
+          ))}
+        </motion.div>
+      </div>
     </section>
   );
 }
-
-export default StudyIndiaHero;

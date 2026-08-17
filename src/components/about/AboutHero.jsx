@@ -54,6 +54,7 @@ export default function AboutHero() {
         className="abt-hero__bg"
       />
       <div className="abt-hero__overlay" />
+      <div className="abt-hero__scrim" />
 
       <div className="abt-hero__inner">
         <motion.nav
@@ -181,24 +182,38 @@ export default function AboutHero() {
           width: 100%;
           height: 100%;
           object-fit: cover;
-          /* photo stays true and vibrant — the single overlay below
-             does all the contrast work, so no extra dimming here */
-          filter: saturate(1.05);
+          /* image stays clearly visible — the medium wash below carries contrast */
+          filter: brightness(0.92) saturate(0.95);
         }
 
-        /* ONE clean, directional wash instead of a stacked
-           overlay + multiply-blend radial scrim. Lighter at the top
-           so the photo actually reads, deepening toward the bottom
-           where the text, buttons, and stat card need contrast. */
+        /* medium, fully opaque purple wash from your theme — no transparency,
+           no near-black darkening, just a solid mid-tone tint over the photo */
         .abt-hero__overlay {
+  position: absolute;
+  inset: 0;
+
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--primary) 75%, transparent) 0%,
+    color-mix(in srgb, var(--primary) 65%, transparent) 45%,
+    color-mix(in srgb, var(--primary-dark) 45%, transparent) 100%
+  );
+
+  mix-blend-mode: normal;
+}
+
+        /* centered scrim so the text block sits on a slightly deeper, calm
+           patch of the same medium tone, regardless of what's behind it */
+        .abt-hero__scrim {
           position: absolute;
           inset: 0;
-          background: linear-gradient(
-            180deg,
-            color-mix(in srgb, var(--primary-dark) 38%, transparent) 0%,
-            color-mix(in srgb, var(--primary-dark) 62%, transparent) 45%,
-            color-mix(in srgb, var(--primary-dark) 86%, transparent) 100%
+          background: radial-gradient(
+            62% 56% at 50% 46%,
+            color-mix(in srgb, var(--primary-dark) 42%, var(--primary) 58%) 0%,
+            transparent 100%
           );
+          mix-blend-mode: multiply;
+          opacity: 0.75;
         }
 
         .abt-hero__inner {
@@ -426,7 +441,7 @@ export default function AboutHero() {
 
         @media (prefers-reduced-motion: reduce) {
           .abt-hero__ticker-dot {
-            animation: none; 
+            animation: none;
           }
         }
       `}</style>

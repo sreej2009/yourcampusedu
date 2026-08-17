@@ -614,6 +614,12 @@ const WorldMap = () => {
                   </div>
                 </div>
 
+                {/*
+                  FIX: was a plain <a href="/destinations/:id">, which 404'd —
+                  App.jsx defines the Country Details route as
+                  /study-destination/:countryId. Switched to React Router's
+                  Link so this is a client-side nav, not a full page reload.
+                */}
                 <Link to={`/study-destination/${selected.id}`} className="sd-map__pass-cta">
                   <span>Explore {selected.name}</span>
                   <ArrowRight size={16} />
